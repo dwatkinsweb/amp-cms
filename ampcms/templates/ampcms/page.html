@@ -1,0 +1,6 @@
+<div xmlns:py="http://genshi.edgewall.org/" id="page" py:attrs="data_tags" class="${data_model.pagelet_layout}">
+	<py:for each="child in children.values()">
+		${child.markup()}
+	</py:for>
+	<div class="clear"> </div>
+</div>

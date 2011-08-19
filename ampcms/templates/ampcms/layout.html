@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:py="http://genshi.edgewall.org/" xmlns:xi="http://www.w3.org/2001/XInclude" py:strip="">
+	<link py:match="modulecss" 
+		  rel="stylesheet" 
+		  type="text/css" 
+		  id="page-css" 
+		  href="/css${children['page'].get_absolute_url()}" />
+	<script py:match="modulejs" 
+			type="text/javascript" 
+			data-main="${MEDIA_URL}ampcms/js/main.js" 
+			src="${MEDIA_URL}ampcms/js/require.jquery.js">
+	</script>
+	
+	<div py:match="content" id="main-content-wrapper">
+		${children['page'].markup()}
+	</div>
+	<div py:match="sidebar" id="side-menu-wrapper">
+		${children['menu-side'].markup()}
+	</div>
+	<div py:match="topbar" id="main-menu-wrapper">
+		${children['menu-main'].markup()}
+	</div>
+
+	<!-- !#TODO(cm): Make this template based on a config file or maybe even a db option -->
+	<xi:include href="base.html"></xi:include>
+</html>

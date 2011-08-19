@@ -1,0 +1,11 @@
+ul.menu-pagelet.menu-main {position: relative; top: 41px; height: 40px; font-weight: bold;}
+ul.menu-pagelet.menu-main li {float: left; height: 40px; margin-right:10px;}
+ul.menu-pagelet.menu-main li a {display: block; float: left; height: 40px; line-height: 40px; 
+	color: #D34F16; text-decoration: none; text-align: center; padding: 0 0 0 4px; cursor: pointer; 
+	background: url('/media/images/tab-inactive-left.png') no-repeat;}
+ul.menu-pagelet.menu-main li a span {float:left; display:block; padding:0 16px 5px 12px;
+	background: url('/media/images/tab-inactive-right.png') no-repeat right top;}
+ul.menu-pagelet.menu-main li a:hover {background: url('/media/images/tab-hover-left.png') no-repeat;}
+ul.menu-pagelet.menu-main li a:hover span {background: url('/media/images/tab-hover-right.png') no-repeat right top;}
+ul.menu-pagelet.menu-main li.selected a {color:#FFF8F4; background: url('/media/images/tab-selected-left.png') no-repeat !important;}
+ul.menu-pagelet.menu-main li.selected a span {background: url('/media/images/tab-selected-right.png') no-repeat right top !important;}
