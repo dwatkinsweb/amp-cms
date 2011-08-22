@@ -13,4 +13,6 @@ settings.AMPCMS_LOGIN_URLCONF = getattr(django_settings, 'AMPCMS_LOGIN_URLCONF',
 settings.AMPCMS_LOGOUT_URL = getattr(django_settings, 'AMPCMS_LOGOUT_URL', '/logout')
 settings.AMPCMS_LOGOUT_URLCONF = getattr(django_settings, 'AMPCMS_LOGOUT_URLCONF', 'auth.urls')
 settings.AMPCMS_PAGELET_LAYOUTS = getattr(django_settings, 'AMPCMS_PAGELET_LAYOUTS', [])
+settings.AMPCMS_PUBLIC_URL = getattr(django_settings, 'AMPCMS_PUBLIC_URL', '/')
+settings.AMPCMS_PERMISSION_DENIED_URL = getattr(django_settings, 'AMPCMS_PERMISSION_DENIED_URL', '/')
 settings.AMPCMS_WYSIWYG = getattr(django_settings, 'AMPCMS_WYSIWYG', False)

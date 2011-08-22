@@ -1,5 +1,5 @@
+from django.http import Http404
 from ampcms.models import User, Group
-from django.http import HttpResponseRedirect
 
 import logging
 log = logging.getLogger(__name__)
@@ -12,6 +12,6 @@ class UserManagement:
                 request.user = User.objects.get(pk=request.user.id)
             except User.DoesNotExist:
                 log.exception('Error replacing user %s with custom user object' % request.user)
-                return HttpResponseRedirect('/admin/') 
-            # TODO(cm): Find a way to replace this with an actual manager instead of a queryset
+                raise Http404
+            # TODO: Find a way to replace this with an actual manager instead of a queryset
             request.user.groups = Group.objects.filter(pk__in=[group.id for group in request.user.groups.all()])

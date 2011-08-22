@@ -2,6 +2,8 @@ from django_genshi.shortcuts import render_to_stream
 from django_genshi import RequestContext
 from genshi.core import Markup
 
+from ampcms import const as C
+
 class BaseContentType(object):
     '''
     Base Content Object to extend when creating different content types
@@ -87,17 +89,16 @@ class BaseContentType(object):
             context = RequestContext(self.request, self.request_kwargs)
         else:
             context = {}
-        #TODO(cm): index by contants here instead of strings
-        context.update({'data_model' : self._data_model,
-                        'children': self.children(),
-                        'data_tags' : self.get_html_data_tags()})
+        context.update({C.CONTENT_TYPE_CONTEXT_DATA_MODEL : self._data_model,
+                        C.CONTENT_TYPE_CONTEXT_CHILDREN: self.children(),
+                        C.CONTENT_TYPE_CONTEXT_HTML_DATA_TAGS : self.get_html_data_tags()})
         return context
     
     def get_html_data_tags(self):
         '''
         Convert the data into jQuery/HTML5 data tags
         '''
-        return {'data-%s' % key: '%s' % val for key, val in self._get_html_data().items()}
+        return {'%s%s' % (C.HTML_DATA_TAG_PREFIX, key) : '%s' % val for key, val in self._get_html_data().items()}
 
     def _get_html_data(self):
         '''

@@ -4,9 +4,10 @@ from django.http import HttpResponseRedirect
 from django.conf import settings
 from django.core.urlresolvers import resolve
 
-from content_type import BaseContentType
-from content_type_mapper import ContentTypeMapper
-from application_mapper import application_mapper
+from ampcms.lib.content_type import BaseContentType
+from ampcms.lib.content_type_mapper import ContentTypeMapper
+from ampcms.lib.application_mapper import application_mapper
+from ampcms import const as C
 
 import json
 
@@ -29,7 +30,7 @@ class BasePagelet(BaseContentType):
     
     def _get_html_data(self):
         if self._data_model is not None:
-            data = {'name' : self._data_model.name}
+            data = {C.HTML_DATA_TAG_KEY_NAME : self._data_model.name}
         else:
             data = {}
         return data
@@ -83,12 +84,12 @@ class MenuPagelet(BasePagelet):
     
     def _get_context(self):
         context = super(MenuPagelet, self)._get_context()
-        context.update({'menu_label': self.menu_label,
-                        'selected_item' : self.selected_item})
+        context.update({C.CONTENT_TYPE_CONTEXT_MENU_LABEL: self.menu_label,
+                        C.CONTENT_TYPE_CONTEXT_SELECTED_ITEM : self.selected_item})
         return context
     
     def _get_html_data(self):
-        data = {'name': self.menu_label}
+        data = {C.HTML_DATA_TAG_KEY_NAME : self.menu_label}
         return data
     
     def _build_css(self):
@@ -141,10 +142,10 @@ class ApplicationPagelet(BasePagelet):
         if process_url is not None:
             self.process_url = process_url
         html = self.html(include_content=True)
-        return json.dumps({'location': self.process_url,
-                           'html': Markup(html),
-                           'css': self._build_css(),
-                           'js': self._build_js(),
+        return json.dumps({C.JSON_KEY_LOCATION: self.process_url,
+                           C.JSON_KEY_HTML: Markup(html),
+                           C.JSON_KEY_CSS: self._build_css(),
+                           C.JSON_KEY_JS: self._build_js(),
                            })
     
     def _build_content(self):
@@ -169,8 +170,8 @@ class ApplicationPagelet(BasePagelet):
 
     def _get_html_data(self):
         data = super(ApplicationPagelet, self)._get_html_data()
-        data.update({'starting_url': self._data_model.starting_url if self._data_model.starting_url else '/',
-                     'application': self._data_model.application})
+        data.update({C.HTML_DATA_TAG_KEY_STARTING_URL : self._data_model.starting_url if self._data_model.starting_url else '/',
+                     C.HTML_DATA_TAG_KEY_APPLICATION : self._data_model.application})
         return data
 
 pagelet_mapper = ContentTypeMapper(BasePagelet)

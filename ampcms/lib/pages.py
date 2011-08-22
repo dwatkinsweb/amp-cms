@@ -1,8 +1,9 @@
 from django.utils.datastructures import SortedDict
 
-from content_type import BaseContentType
-from content_type_mapper import ContentTypeMapper
-import pagelets
+from ampcms.lib.content_type import BaseContentType
+from ampcms.lib.content_type_mapper import ContentTypeMapper
+from ampcms.lib import pagelets
+from ampcms import const as C
 
 class BasePage(BaseContentType):
     '''
@@ -18,8 +19,8 @@ class BasePage(BaseContentType):
         self._template = 'page'
     
     def _get_html_data(self):
-        data = {'url' : self.get_absolute_url(),
-                'name' : self._data_model.name}
+        data = {C.HTML_DATA_TAG_KEY_URL : self.get_absolute_url(),
+                C.HTML_DATA_TAG_KEY_NAME : self._data_model.name}
         return data
     
     def get_absolute_url(self):

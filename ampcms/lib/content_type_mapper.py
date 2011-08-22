@@ -1,5 +1,6 @@
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
-from django.conf import settings
+from ampcms.conf import settings
+from ampcms import const as C
 
 class ContentTypeMapper(object):
     def __init__(self, item_type):
@@ -10,10 +11,10 @@ class ContentTypeMapper(object):
     def autodiscover(self):
         if self.discovered:
             return
-        if hasattr(settings, 'AMPCMS_APPLICATIONS'):
+        if settings.AMPCMS_APPLICATIONS:
             for module in settings.AMPCMS_APPLICATIONS:
                 #FIXME: change this to look for ampcms instead of content_manager and put it in a const file or something
-                __import__(module, {}, {}, ['content_manager'])
+                __import__(module, {}, {}, [C.APPLICATION_INITIALIZATION_MODULE])
         self.discovered = True
     
     def clear(self):

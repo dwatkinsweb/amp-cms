@@ -1,5 +1,6 @@
 from ampcms.models import Site, get_module_and_page, get_user_module_and_page
 from ampcms.lib.exceptions import PageDoesNotExist
+from ampcms.conf import settings
 from django.utils.functional import wraps
 from django.utils.decorators import available_attrs
 from django.utils.http import urlquote
@@ -8,13 +9,7 @@ from django.http import HttpResponseRedirect
 import logging
 log = logging.getLogger(__name__)
 
-def user_passes_test(function, login_url=None, public_url='/', permission_denied_url='/'):
-    ''' TODO(cm): public_url and permission_denied_url should be from a settings file in content manager. 
-        This would be the public home page, and a permission deined page respectively '''
-    if not login_url:
-        from django.conf import settings
-        login_url = settings.LOGIN_URL
-        
+def user_passes_test(function, login_url=settings.AMPCMS_LOGIN_URL, public_url=settings.AMPCMS_PUBLIC_URL, permission_denied_url=settings.AMPCMS_PERMISSION_DENIED_URL):
     def _decorator(view_func):
         def _wrapped_view(request, *args, **kwargs):
             site = Site.objects.get_current()
@@ -24,9 +19,7 @@ def user_passes_test(function, login_url=None, public_url='/', permission_denied
                     module, page = get_module_and_page(site, kwargs.get('module'), kwargs.get('page'))
                 except (PageDoesNotExist):
                     # Redirect to the public home page
-                    # TODO(cm): Create a public home page
-                    #return HttpResponseRedirect(public_url)
-                    return HttpResponseRedirect('%s?next=%s' % (login_url, urlquote(request.get_full_path())))
+                    return HttpResponseRedirect(public_url)
                 else:
                     log.info('Successfully loaded module and page: User %s viewing page %s.%s' 
                               % (request.user.username, module.name, page.name))
@@ -35,14 +28,12 @@ def user_passes_test(function, login_url=None, public_url='/', permission_denied
                 try:
                     module, page = get_user_module_and_page(request.user, site, kwargs.get('module'), kwargs.get('page'))
                 except (PageDoesNotExist):
-                    # TODO(cm): Create a permission denied page
-                    #return HttpResponseRedirect(permission_denied_url)
-                    return HttpResponseRedirect('%s?next=%s' % (login_url, urlquote(request.get_full_path())))
+                    return HttpResponseRedirect(permission_denied_url)
                 else:
                     log.info('Successfully loaded module and page: User %s viewing page %s.%s' 
                               % (request.user.username, module.name, page.name))
             else:
-                # TODO(cm): Find a way to be able to redirect with the hash tag still available. Will require javascript.
+                # TODO: Find a way to be able to redirect with the hash tag still available. Will require javascript.
                 return HttpResponseRedirect('%s?next=%s' % (login_url, urlquote(request.get_full_path())))
             
             kwargs.update({
@@ -58,7 +49,7 @@ def user_passes_test(function, login_url=None, public_url='/', permission_denied
         return wraps(view_func, assigned=available_attrs(view_func))(_wrapped_view)
     return _decorator
 
-def acl_required(function=None, login_url=None, public_url='/', permission_denied_url='/'):
+def acl_required(function=None, login_url=settings.AMPCMS_LOGIN_URL, public_url=settings.AMPCMS_PUBLIC_URL, permission_denied_url=settings.AMPCMS_PERMISSION_DENIED_URL):
     """
     Decorator for views that checks that the user is logged in, redirecting
     to the log-in page if necessary.

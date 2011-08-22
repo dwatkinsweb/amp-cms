@@ -1,6 +1,6 @@
 from ampcms.lib import layouts, pages
 from ampcms.decorators import acl_required
-from django.conf import settings
+from ampcms.conf import settings
 from django.core.urlresolvers import resolve
 from django.http import HttpResponse, HttpResponseRedirect
 from django_genshi import RequestContext, render_to_response
@@ -29,7 +29,7 @@ def logout(request, *args, **kwargs):
     kwargs.update({'callback_url': '/login'})
     return view(request, *args, **kwargs)
 
-@acl_required(login_url='/login')
+@acl_required()
 def index(request, *args, **kwargs):
     log.debug('ampcms.views.index - start')
     page = kwargs.pop('page_model')
@@ -39,7 +39,7 @@ def index(request, *args, **kwargs):
     log.debug('ampcms.views.index - end')
     return HttpResponse(layout.html())
 
-@acl_required(login_url='/login')
+@acl_required()
 def full_page(request, *args, **kwargs):
     log.debug('ampcms.views.full_page - start')
     page = kwargs.pop('page_model')
@@ -49,7 +49,7 @@ def full_page(request, *args, **kwargs):
     log.debug('ampcms.views.full_page - end')
     return HttpResponse(layout.html())
     
-@acl_required(login_url='/login')
+@acl_required()
 def page(request, *args, **kwargs):
     log.debug('ampcms.views.page - start')
     page = kwargs.pop('page_model')
@@ -57,7 +57,7 @@ def page(request, *args, **kwargs):
     log.debug('ampcms.views.page - end')
     return HttpResponse(page_object.html())
 
-@acl_required(login_url='/login')
+@acl_required()
 def pagelet(request, *args, **kwargs):
     log.debug('ampcms.views.pagelet (%s, %s) - start' % (kwargs.get('pagelet', ''), kwargs.get('url', '')))
     page = kwargs.pop('page_model')
@@ -70,7 +70,7 @@ def pagelet(request, *args, **kwargs):
         process_url = '/'
     return HttpResponse(pagelet_object.json(process_url))
 
-@acl_required(login_url='/login')
+@acl_required()
 def css(request, *args, **kwargs):
     # TODO(cm): This probably shouldn't use acl_required
     ''' Build the css for the page based on page and pagelets '''
