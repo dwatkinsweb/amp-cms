@@ -13,7 +13,6 @@ class ContentTypeMapper(object):
             return
         if settings.AMPCMS_APPLICATIONS:
             for module in settings.AMPCMS_APPLICATIONS:
-                #FIXME: change this to look for ampcms instead of content_manager and put it in a const file or something
                 __import__(module, {}, {}, [C.APPLICATION_INITIALIZATION_MODULE])
         self.discovered = True
     

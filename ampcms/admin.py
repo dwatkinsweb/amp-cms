@@ -154,15 +154,6 @@ class PageAdmin(admin.ModelAdmin):
             return ''
     view_on_site.allow_tags = True
 
-if settings.AMPCMS_WYSIWYG == 'ckeditor':
-    from ckeditor.widgets import CKEditorWidget
-    class PageletAdminForm(forms.ModelForm):
-        content = forms.CharField(widget=CKEditorWidget())
-        class Meta:
-            model = Pagelet
-        class Media:
-            js = ('/media/ckeditor/ckeditor/ckeditor.js',)
-
 class PageletAdmin(admin.ModelAdmin):
     fieldsets = (
         ('Names', {'fields': ('name', 'title')}),
@@ -172,7 +163,6 @@ class PageletAdmin(admin.ModelAdmin):
     list_filter = ('active', 'page', 'pagelet_class')
     inlines = [PageletAttributeInline]
     actions = ['activate', 'deactivate']
-    form = PageletAdminForm
     
     def full_name(self, obj):
         return '%s.%s.%s' % (obj.page.module.name, obj.page.name, obj.name)
@@ -195,6 +185,16 @@ class PageletAdmin(admin.ModelAdmin):
             msg = '%s pagelets were activated' % rows_updated
         self.message_user(request, msg)
     deactivate.short_description = 'Deactivate selected pagelets'
+
+if settings.AMPCMS_WYSIWYG == 'ckeditor':
+    from ckeditor.widgets import CKEditorWidget
+    class PageletAdminForm(forms.ModelForm):
+        content = forms.CharField(widget=CKEditorWidget())
+        class Meta:
+            model = Pagelet
+        class Media:
+            js = ('/media/ckeditor/ckeditor/ckeditor.js',)
+    PageletAdmin.form = PageletAdminForm
 
 admin.site.register(User, UserAdmin)
 admin.site.register(Group, GroupAdmin)
