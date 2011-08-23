@@ -10,6 +10,8 @@ Requirements
 
 * Python 2.7
 * Django 1.2
+* Genshi 0.6 http://genshi.edgewall.org/
+* Django_Genshi 1.1.3 http://pypi.python.org/pypi/django-genshi/1.1.3
 
 Notes
 -----

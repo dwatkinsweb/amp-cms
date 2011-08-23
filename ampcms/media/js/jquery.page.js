@@ -1,4 +1,4 @@
-define(['jquery', 'jquery.pagelet'], function($, pagelet) {
+define(["jquery", "jquery.pagelet", "amplify.core"], function($, pagelet) {
 	return {
 		element: null,
 		data: null,
@@ -30,7 +30,7 @@ define(['jquery', 'jquery.pagelet'], function($, pagelet) {
 				pagelet_list[data.name] = pagelet.init(element, page_object).load();
 			});
 			this.pagelets = pagelet_list;
-			$(document).trigger('ampcms.fullpageletload', [this]);
+			amplify.publish('ampcms.fullpageletload', this);
 			return this;
 		},
 		_load_html: function(html) {
@@ -39,7 +39,7 @@ define(['jquery', 'jquery.pagelet'], function($, pagelet) {
 			this.element.replaceWith(new_page);
 			this.element = new_page;
 			this.data = this.element.data();
-			$(document).trigger('ampcms.pageload', [this]);
+			amplify.publish('ampcms.pageload', this);
 			return this;
 		}
 	};

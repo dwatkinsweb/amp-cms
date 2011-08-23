@@ -1,4 +1,4 @@
-define(["require", "jquery", "jquery.ba-bbq.min"], function(require, $) {
+define(["require", "jquery", "jquery.ba-bbq.min", "amplify.core"], function(require, $) {
 	return {
 		element: null,
 		data: null,
@@ -91,7 +91,7 @@ define(["require", "jquery", "jquery.ba-bbq.min"], function(require, $) {
 			this.element.parents('.pagelet-wrapper').replaceWith(new_pagelet);
 			this.element = $('.pagelet', new_pagelet);
 			this.data = this.element.data();
-			$(document).trigger('ampcms.pageletload', [this, this.data.application]);
+			amplify.publish('ampcms.pageletload', this, this.data.application);
 			return this;
 		},
 		_get_pagelet_url: function(pagelet_url) {

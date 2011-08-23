@@ -1,16 +1,18 @@
-require(["jquery", "jquery.page", "jquery.pagelet", "jquery.ba-bbq.min"], function($, page, pagelet) {
+require(["jquery", "jquery.page", "jquery.pagelet", "jquery.ba-bbq", "amplify.core"], function($, Page, Pagelet) {
 	require.ready(function(){
 		// Load the page
-		var page_object = page.init('#page');
-		$(window).bind('hashchange', function(event){
-			page_object.load_pagelets();
+		var page = Page.init('#page');
+		
+		amplify.subscribe('ampcms.pageletload', function(pagelet) {
+			pagelet.transform_links().transform_forms();
 		});
-		$(document).bind('ampcms.pageletload', function(event, pagelet_object) {
-			pagelet_object.transform_links().transform_forms();
-		});
-		$(document).bind('ampcms.pageload', function(event, page_object) {
+		amplify.subscribe('ampcms.pageload', function(page) {
 			$(window).trigger('hashchange');
 		});
-		page_object.load_pagelets();
+		// TODO: Find a way to implement this using ampilfy instead of jquery bind/trigger
+		$(window).bind('hashchange', function(event){
+			page.load_pagelets();
+		});
+		page.load_pagelets();
 	});
 });
