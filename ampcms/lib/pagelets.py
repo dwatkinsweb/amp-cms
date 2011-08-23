@@ -142,7 +142,8 @@ class ApplicationPagelet(BasePagelet):
         if process_url is not None:
             self.process_url = process_url
         html = self.html(include_content=True)
-        return json.dumps({C.JSON_KEY_LOCATION: self.process_url,
+        return json.dumps({C.JSON_KEY_NAME: self._data_model.name,
+                           C.JSON_KEY_LOCATION: self.process_url,
                            C.JSON_KEY_HTML: Markup(html),
                            C.JSON_KEY_CSS: self._build_css(),
                            C.JSON_KEY_JS: self._build_js(),

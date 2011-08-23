@@ -1,7 +1,7 @@
 require(["jquery", "jquery.page", "jquery.pagelet", "jquery.ba-bbq", "amplify.core"], function($, Page, Pagelet) {
 	require.ready(function(){
 		// Load the page
-		var page = Page.init('#page');
+		var page = Page().init('#page');
 		
 		amplify.subscribe('ampcms.pageletload', function(pagelet) {
 			pagelet.transform_links().transform_forms();
