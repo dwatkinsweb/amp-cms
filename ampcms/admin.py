@@ -72,10 +72,10 @@ class ModuleAdmin(admin.ModelAdmin):
         js = (
             'ampcms/js/jquery.min.js',
             'ampcms/js/jquery-ui.min.js',
-            'ampcms/js/jquery.sortable-result_list.js',
-            'ampcms/js/sortable-result_list.js',
-            'ampcms/js/jquery.sortable-inline.js',
-            'ampcms/js/sortable-inline.js',)
+            'ampcms/js/admin/jquery.sortable-result_list.js',
+            'ampcms/js/admin/sortable-result_list.js',
+            'ampcms/js/admin/jquery.sortable-inline.js',
+            'ampcms/js/admin/sortable-inline.js',)
         css = {
             'all': ('ampcms/css/admin-extended.css',)
         }
@@ -119,8 +119,8 @@ class PageAdmin(admin.ModelAdmin):
         js = (
             'ampcms/js/jquery.min.js',
             'ampcms/js/jquery-ui.min.js',
-            'ampcms/js/jquery.sortable-inline.js',
-            'ampcms/js/sortable-inline.js',)
+            'ampcms/js/admin/jquery.sortable-inline.js',
+            'ampcms/js/admin/sortable-inline.js',)
         css = {
             'all': ('ampcms/css/admin-extended.css',)
         }
