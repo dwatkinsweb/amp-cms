@@ -148,13 +148,13 @@ class ApplicationPagelet(BasePagelet):
                            C.JSON_KEY_JS: self._build_js(),
                            })
     
-    def _build_content(self):
+    def _build_content(self, process_url=None):
         '''
         Resolve starting_url to a view and make a call to that view. If receives a HttpResponseRedirect back from, use the new
         location to resolve a new view and make a call to that view.
-        @param starting_url: starting_url to build content based on. Will default to self.starting_url if None is passed.
+        @param process_url: starting_url to build content based on. Will default to self.starting_url if None is passed.
         '''
-        if self.process_url is None and self._data_model.starting_url is not None:
+        if process_url is not None and self.process_url is None and self._data_model.starting_url is not None:
             self.process_url = self._data_model.starting_url
         elif self.process_url is None:
             self.process_url = '/'
