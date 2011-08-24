@@ -96,7 +96,7 @@ class MenuPagelet(BasePagelet):
         '''
         Return the css based on the menu_label
         '''
-        return ['%scss/%s.css' % (settings.AMPCMS_MEDIA_URL, self.menu_label)]
+        return ['%scss/%s.css' % (settings.MEDIA_URL, self.menu_label)]
 
 class SimplePagelet(BasePagelet):
     '''
