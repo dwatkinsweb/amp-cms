@@ -48,7 +48,7 @@ class Module(models.Model):
         ordering = ['order']
 
 class Page(models.Model):
-    # TODO(cm): Allow for a many to many relationship between page and pagelet
+    # TODO: Allow for a many to many relationship between page and pagelet
     name = models.CharField(max_length=30)
     title = models.CharField(max_length=30)
     page_class = models.CharField(max_length=30, choices=[(page_name, page_name) for page_name, page in page_mapper.items])

@@ -30,13 +30,13 @@ class BaseContentType(object):
         return self._children
 
     def _build_children(self):
-        #TODO(cm): maybe have this raise a NotImplementedError
+        #TODO: maybe have this raise a NotImplementedError
         return {}
 
     def css(self):
         '''
         Return the css for the layout and removes any duplicate entries. Will build the css if not already built.
-        TODO(cm): Turn this into a concatenation of the files 
+        TODO: Turn this into a concatenation of the files 
         '''
         if self._css is None:
             css_list = self._build_css()
@@ -74,10 +74,10 @@ class BaseContentType(object):
     def _get_template(self):
         '''
         Return the template needed for the object
-        @TODO(cm): maybe remove ampcms/ from this and just return template. or remove this function all together?
+        @TODO: maybe remove ampcms/ from this and just return template. or remove this function all together?
         '''
         if self._template is None:
-            #TODO(cm): Add a custom exception
+            #TODO: Add a custom exception
             raise Exception('No template defined for object %s' % type(self))
         return 'ampcms/%s.html' % self._template
     
@@ -104,5 +104,5 @@ class BaseContentType(object):
         '''
         Return a dictionary of data that will be transformed into jQuery/HTML5 data tags
         '''
-        #TODO(cm): maybe have this raise a NotImplementedError
+        #TODO: maybe have this raise a NotImplementedError
         return {}

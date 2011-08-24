@@ -34,7 +34,7 @@ def index(request, *args, **kwargs):
     log.debug('ampcms.views.index - start')
     page = kwargs.pop('page_model')
     page_object = pages.page_mapper.get_item(page.page_class)(request=request, request_kwargs=kwargs, page=page)
-    # TODO(cm): need to get the layout based on meta[user_agent]
+    # TODO: need to get the layout based on meta[user_agent]
     layout = layouts.PCLayout(request=request, request_kwargs=kwargs, page=page_object)
     log.debug('ampcms.views.index - end')
     return HttpResponse(layout.html())
@@ -44,7 +44,7 @@ def full_page(request, *args, **kwargs):
     log.debug('ampcms.views.full_page - start')
     page = kwargs.pop('page_model')
     page_object = pages.page_mapper.get_item(page.page_class)(page=page, request=request, request_kwargs=kwargs)
-    # TODO(cm): need to get the layout based on meta[user_agent]
+    # TODO: need to get the layout based on meta[user_agent]
     layout = layouts.PCLayout(user=request.user, page=page_object, request=request, request_kwargs=kwargs, block_load=True)
     log.debug('ampcms.views.full_page - end')
     return HttpResponse(layout.html())
@@ -68,11 +68,15 @@ def pagelet(request, *args, **kwargs):
         process_url = '/'+kwargs['url']
     else:
         process_url = '/'
-    return HttpResponse(pagelet_object.json(process_url))
+    response = HttpResponse(pagelet_object.json(process_url))
+    # TODO: Come up with a better way to ignore cache for IE
+    if 'MSIE' in request.META['HTTP_USER_AGENT']:
+        response['Cache-Control'] = 'max-age=0,no-cache,no-store,post-check=0,pre-check=0'
+    return response
 
 @acl_required()
 def css(request, *args, **kwargs):
-    # TODO(cm): This probably shouldn't use acl_required
+    # TODO: This probably shouldn't use acl_required
     ''' Build the css for the page based on page and pagelets '''
     log.debug('ampcms.views.css - start')
     page = kwargs.pop('page_model')
