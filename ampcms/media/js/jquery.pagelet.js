@@ -1,4 +1,4 @@
-define(["require", "jquery", "jquery.ba-bbq.min", "amplify.core"], function(require, $) {
+define(["require", "jquery", "jquery.ba-bbq", "amplify.core"], function(require, $) {
 	return function() {
 		return {
 			element: null,
