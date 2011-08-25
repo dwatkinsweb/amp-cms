@@ -172,6 +172,7 @@ class ApplicationPagelet(BasePagelet):
     def _get_html_data(self):
         data = super(ApplicationPagelet, self)._get_html_data()
         data.update({C.HTML_DATA_TAG_KEY_STARTING_URL : self._data_model.starting_url if self._data_model.starting_url else '/',
+                     C.HTML_DATA_TAG_KEY_LOCATION: self.process_url,
                      C.HTML_DATA_TAG_KEY_APPLICATION : self._data_model.application})
         return data
 

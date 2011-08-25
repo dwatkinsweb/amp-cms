@@ -13,7 +13,7 @@ define(["require", "jquery", "jquery.ba-bbq", "amplify.core"], function(require,
 			load: function(pagelet_url) {
 				var this_pagelet = this; // set THIS into a variable to use in the .get callback
 				pagelet_url = this._get_pagelet_url(pagelet_url);
-				if (pagelet_url != undefined) {
+				if (pagelet_url != undefined && pagelet_url != this.data.location) {
 					pagelet_url = '/pagelet'+this.page.data.url+'/'+this.data.name+pagelet_url;
 					$.get(pagelet_url, function(response){
 						response = $.parseJSON(response);
