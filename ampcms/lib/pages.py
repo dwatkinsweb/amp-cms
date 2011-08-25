@@ -49,7 +49,7 @@ class PageletPage(BasePage):
         in the structure {<pagelet.name>:<pagelet>, ...}
         '''
         _pagelets = SortedDict()
-        for pagelet in self._data_model.active_pagelets():
+        for pagelet in self._data_model.pagelets.active():
             pagelet_class = pagelets.pagelet_mapper.get_item(pagelet.pagelet_class)
             _pagelets[pagelet.name] = pagelet_class(request=self.request, request_kwargs=self.request_kwargs, pagelet=pagelet)
         return _pagelets

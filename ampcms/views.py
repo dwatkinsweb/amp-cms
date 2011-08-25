@@ -76,7 +76,7 @@ def pagelet(request, *args, **kwargs):
 
 @acl_required()
 def css(request, *args, **kwargs):
-    # TODO: This probably shouldn't use acl_required
+    # TODO: remove acl_required decorator. Currently needed to be able to load the models correctly.
     ''' Build the css for the page based on page and pagelets '''
     log.debug('ampcms.views.css - start')
     page = kwargs.pop('page_model')

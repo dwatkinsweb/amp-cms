@@ -62,10 +62,6 @@ class Page(models.Model):
     
     objects = managers.PageManager()
     
-    def active_pagelets(self):
-        # FIXME: Move this into the manager
-        return self.pagelets.filter(active=True)
-    
     def get_absolute_url(self):
         return '/%s/%s' % (self.module.name, self.name)
     
@@ -145,7 +141,6 @@ def get_module_and_page(site, module_name, page_name):
         raise Exception(msg)
     
     try:
-        # TODO: don't think I need this check anymore
         if module_name is None:
             try:
                 page = Page.objects.active_site_pages(site)[0]

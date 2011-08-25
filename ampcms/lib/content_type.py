@@ -75,7 +75,6 @@ class BaseContentType(object):
     def _get_template(self):
         '''
         Return the template needed for the object
-        @TODO: remove ampcms/ from this and just return template. or remove this function all together?
         '''
         if self._template is None:
             raise ImproperlyConfigured('No template defined for object %s' % type(self))
