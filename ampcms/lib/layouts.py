@@ -16,7 +16,7 @@ class BaseLayout(BaseContentType):
         '''
         super(BaseLayout, self).__init__(*args, **kwargs)
         self._page = page
-        self._template = 'layout'
+        self._template = 'ampcms/layout.html'
 
     def _build_children(self):
         '''

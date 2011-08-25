@@ -16,7 +16,7 @@ class BasePage(BaseContentType):
         '''
         super(BasePage, self).__init__(*args, **kwargs)
         self._data_model = page
-        self._template = 'page'
+        self._template = 'ampcms/page.html'
     
     def _get_html_data(self):
         data = {C.HTML_DATA_TAG_KEY_URL : self.get_absolute_url(),

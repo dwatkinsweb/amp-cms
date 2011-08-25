@@ -3,6 +3,7 @@ from django_genshi import RequestContext
 from genshi.core import Markup
 
 from ampcms import const as C
+from django.core.exceptions import ImproperlyConfigured
 
 class BaseContentType(object):
     '''
@@ -74,12 +75,11 @@ class BaseContentType(object):
     def _get_template(self):
         '''
         Return the template needed for the object
-        @TODO: maybe remove ampcms/ from this and just return template. or remove this function all together?
+        @TODO: remove ampcms/ from this and just return template. or remove this function all together?
         '''
         if self._template is None:
-            #TODO: Add a custom exception
-            raise Exception('No template defined for object %s' % type(self))
-        return 'ampcms/%s.html' % self._template
+            raise ImproperlyConfigured('No template defined for object %s' % type(self))
+        return self._template
     
     def _get_context(self):
         '''

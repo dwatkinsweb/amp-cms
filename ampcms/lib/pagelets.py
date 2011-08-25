@@ -18,7 +18,7 @@ class BasePagelet(BaseContentType):
     Only methods that should need to be overwritten are _get_context and _get_template.
     Will look in /pagelets folder when grabbing media and templates
     '''
-    def __init__(self, pagelet=None, template='pagelets/base', **kwargs):
+    def __init__(self, pagelet=None, template='ampcms/pagelets/base.html', **kwargs):
         '''
         @param pagelet: pagelet instance from the pagelet model
         @param template: name of the template
@@ -61,7 +61,7 @@ class MenuPagelet(BasePagelet):
     '''
     Pagelet used to build a menu. This is not a pagelet that 
     '''
-    def __init__(self, menu_label=None, selected_item=None, template='pagelets/menu', pagelet=None, **kwargs):
+    def __init__(self, menu_label=None, selected_item=None, template='ampcms/pagelets/menu.html', pagelet=None, **kwargs):
         '''
         Initialize the menu. Default this pagelet to None because the pagelet may not be created from the database.
         @param menu_label: label of the menu used as the <ul> class and id
@@ -102,7 +102,7 @@ class SimplePagelet(BasePagelet):
     '''
     Simple container that displays a small bit of html output
     '''
-    def __init__(self, template='pagelets/simple', **kwargs):
+    def __init__(self, template='ampcms/pagelets/simple.html', **kwargs):
         super(SimplePagelet, self).__init__(**kwargs)
         self._template = template
     
@@ -116,7 +116,7 @@ class ApplicationPagelet(BasePagelet):
     A pagelet that creates its content based on the url of another application. 
     It will display the application within the pagelet.
     '''
-    def __init__(self, template='pagelets/application', **kwargs):
+    def __init__(self, template='ampcms/pagelets/application.html', **kwargs):
         super(ApplicationPagelet, self).__init__(**kwargs)
         self._template = template
         self.process_url = None
