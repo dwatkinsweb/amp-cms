@@ -155,18 +155,20 @@ class ApplicationPagelet(BasePagelet):
         location to resolve a new view and make a call to that view.
         @param process_url: starting_url to build content based on. Will default to self.starting_url if None is passed.
         '''
+        # FIXME: this is handled backwards. any process url sent in should ovewrite anything else.
         if process_url is not None and self.process_url is None and self._data_model.starting_url is not None:
             self.process_url = self._data_model.starting_url
         elif self.process_url is None:
             self.process_url = '/'
         else:
             self.process_url = self.process_url
-        urlconf = application_mapper.get_item(self._data_model.application).urlconf
-        view, args, kwargs = resolve(self.process_url, urlconf)
+        application = application_mapper.get_item(self._data_model.application)
+        view, args, kwargs = resolve(self.process_url, application.urlconf)
         content = view(self.request, *args, **kwargs)
         if isinstance(content, HttpResponseRedirect):
-            self.process_url = content['location']
-            return self._build_content(content['location'])
+            # TODO: I don't like the way this is removing the prefix out of the url but couldn't think of anything better atm.
+            self.process_url = content['location'].replace('/%s' % application.url_prefix, '', 1)
+            return self._build_content()
         return Markup(content.content)
 
     def _get_html_data(self):
