@@ -25,9 +25,9 @@ define(["require", "jquery", "jquery.ba-bbq", "amplify.core"], function(require,
 					$.get(pagelet_url, function(response){
 						response = $.parseJSON(response);
 						if (response.css) {
-							for (i in response.css) {
-								if (document.createStylesheet) {
-									document.createStylesheet(response.css[i]);
+							for (i = 0; i < response.css.length; i++) {
+								if (document.createStyleSheet) {
+									document.createStyleSheet(response.css[i]);
 								} else {
 									$("head").append($("<link rel='stylesheet' href='"+response.css[i]+"' type='text/css' />"));
 								}
