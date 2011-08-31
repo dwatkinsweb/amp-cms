@@ -11,6 +11,9 @@ from ampcms import const as C
 
 import json
 
+import logging
+log = logging.getLogger(__name__)
+
 class BasePagelet(BaseContentType):
     '''
     Base pagelet object for all pagelets to extend.
@@ -27,6 +30,8 @@ class BasePagelet(BaseContentType):
         super(BasePagelet, self).__init__(**kwargs)
         self._data_model = pagelet
         self._template = template
+        self.view_css = []
+        self.view_js = []
     
     def _get_html_data(self):
         if self._data_model is not None:
@@ -44,6 +49,7 @@ class BasePagelet(BaseContentType):
             css = [val.strip() for val in css.split(',')]
         else:
             css = []
+        css += self.view_css
         return css
     
     def _build_js(self):
@@ -55,6 +61,7 @@ class BasePagelet(BaseContentType):
             js = [val.strip() for val in js.split(',')]
         else:
             js = []
+        js += self.view_js
         return js
 
 class MenuPagelet(BasePagelet):
@@ -162,14 +169,22 @@ class ApplicationPagelet(BasePagelet):
             self.process_url = '/'
         else:
             self.process_url = self.process_url
-        application = application_mapper.get_item(self._data_model.application)
-        view, args, kwargs = resolve(self.process_url, application.urlconf)
-        content = view(self.request, *args, **kwargs)
-        if isinstance(content, HttpResponseRedirect):
-            # TODO: I don't like the way this is removing the prefix out of the url but couldn't think of anything better atm.
-            self.process_url = content['location'].replace('/%s' % application.url_prefix, '', 1)
-            return self._build_content()
-        return Markup(content.content)
+        try:
+            application = application_mapper.get_item(self._data_model.application)
+            view, args, kwargs = resolve(self.process_url, application.urlconf)
+            self.request.is_ampcms = True
+            response = view(self.request, *args, **kwargs)
+            if isinstance(response, HttpResponseRedirect):
+                # TODO: I don't like the way this is removing the prefix out of the url but couldn't think of anything better atm.
+                self.process_url = response['location'].replace('/%s' % application.url_prefix, '', 1)
+                return self._build_content()
+            if hasattr(response, 'ampcms_media'):
+                self.view_css = response.ampcms_media.css
+                self.view_js = response.ampcms_media.js
+            return Markup(response.content)
+        except Exception, e:
+            log.exception('Exception loading application pagelet: %s' % e)
+            raise
 
     def _get_html_data(self):
         data = super(ApplicationPagelet, self)._get_html_data()

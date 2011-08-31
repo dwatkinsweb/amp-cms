@@ -10,11 +10,18 @@ define(["require", "jquery", "jquery.ba-bbq", "amplify.core"], function(require,
 				this.data = this.element.data();
 				return this;
 			},
+			push_url: function(url) {
+				var element_id = this.element.attr('id');
+				var element_state = {};
+				element_state[element_id] = url;
+				$.bbq.pushState(element_state);
+				return this
+			},
 			load: function(pagelet_url) {
 				var this_pagelet = this; // set THIS into a variable to use in the .get callback
 				pagelet_url = this._get_pagelet_url(pagelet_url);
 				if (pagelet_url != undefined && pagelet_url != this.data.location) {
-					pagelet_url = '/pagelet'+this.page.data.url+'/'+this.data.name+pagelet_url;
+					pagelet_url = this._build_url(pagelet_url);
 					$.get(pagelet_url, function(response){
 						response = $.parseJSON(response);
 						if (response.css) {
@@ -41,7 +48,7 @@ define(["require", "jquery", "jquery.ba-bbq", "amplify.core"], function(require,
 				var form_url = $(form).attr('action');
 				var pagelet_url = this._get_pagelet_url(pagelet_url); 
 				if (form_url == '' || form_url == undefined) {
-					form_url = '/pagelet'+this.page.data.url+'/'+this.data.name+pagelet_url;
+					form_url = this._build_url(pagelet_url);
 				} else {
 					form_url = '/pagelet'+this.page.data.url+form_url;
 				}
@@ -52,10 +59,7 @@ define(["require", "jquery", "jquery.ba-bbq", "amplify.core"], function(require,
 					success: function(response){
 						response = $.parseJSON(response);
 						var new_element = $(response.html);
-						var element_id = $('.pagelet', new_element).attr('id');
-						var element_state = {};
-						element_state[element_id] = response.location;
-						$.bbq.pushState(element_state);
+						this.push_url(response.location);
 						this_pagelet._load_html(new_element);
 					}
 				});
@@ -70,10 +74,7 @@ define(["require", "jquery", "jquery.ba-bbq", "amplify.core"], function(require,
 				});
 				$(this_pagelet.element).delegate('a', 'click', function(event) {
 					var anchor_url = $(this).attr('href').split('#')[1];
-					var element_id = this_pagelet.element.attr('id');
-					var element_state = {};
-					element_state[element_id] = anchor_url;
-					$.bbq.pushState(element_state);
+					this.push_url(anchor_url);
 					this_pagelet.data = this_pagelet.element.data();
 					return false;
 				});
@@ -86,6 +87,9 @@ define(["require", "jquery", "jquery.ba-bbq", "amplify.core"], function(require,
 					this_pagelet.post($(this));
 				});
 				return this;
+			},
+			_build_url: function(pagelet_url) {
+				return '/pagelet'+this.page.data.url+'/'+this.data.name+pagelet_url;
 			},
 			_load_html: function(html) {
 				var new_pagelet = $(html);
