@@ -26,10 +26,12 @@ define(["require", "jquery", "jquery.ba-bbq", "amplify.core"], function(require,
 						response = $.parseJSON(response);
 						if (response.css) {
 							for (i = 0; i < response.css.length; i++) {
-								if (document.createStyleSheet) {
-									document.createStyleSheet(response.css[i]);
-								} else {
-									$("head").append($("<link rel='stylesheet' href='"+response.css[i]+"' type='text/css' />"));
+								if (response.css[i] != "") {
+									if (document.createStyleSheet) {
+										document.createStyleSheet(response.css[i]);
+									} else {
+										$("head").append($("<link rel='stylesheet' href='"+response.css[i]+"' type='text/css' />"));
+									}
 								}
 							}
 						}
@@ -37,6 +39,8 @@ define(["require", "jquery", "jquery.ba-bbq", "amplify.core"], function(require,
 							require(response.js, function() {
 								this_pagelet._load_html(response.html);
 							});
+						} else {
+							this_pagelet._load_html(response.html);
 						}
 					});
 				}
@@ -59,7 +63,7 @@ define(["require", "jquery", "jquery.ba-bbq", "amplify.core"], function(require,
 					success: function(response){
 						response = $.parseJSON(response);
 						var new_element = $(response.html);
-						this.push_url(response.location);
+						this_pagelet.push_url(response.location);
 						this_pagelet._load_html(new_element);
 					}
 				});

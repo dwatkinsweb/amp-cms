@@ -5,6 +5,7 @@ require(["jquery", "jquery.page", "jquery.pagelet", "jquery.ba-bbq", "amplify.co
 		
 		amplify.subscribe('ampcms.pageletload', function(pagelet) {
 			pagelet.transform_links().transform_forms();
+			amplify.publish('ampcms.pageletinit', pagelet);
 		});
 		amplify.subscribe('ampcms.pageload', function(page) {
 			$(window).trigger('hashchange');

@@ -50,7 +50,7 @@ class BasePagelet(BaseContentType):
         else:
             css = []
         css += self.view_css
-        return css
+        return filter(None, css)
     
     def _build_js(self):
         '''
@@ -62,7 +62,7 @@ class BasePagelet(BaseContentType):
         else:
             js = []
         js += self.view_js
-        return js
+        return filter(None, js)
 
 class MenuPagelet(BasePagelet):
     '''
