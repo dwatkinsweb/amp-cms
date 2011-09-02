@@ -8,8 +8,8 @@ define ['jquery', 'pagelet','amplify.core'], ($, Pagelet) ->
         load: (url) ->
             url = if url then url else @data.url
             if url
-              url = '/page'+url
-              $.get(url, @_load_html)
+                url = '/page'+url
+                $.get(url, @_load_html)
             @
 	  
         load_pagelets: () ->

@@ -6,6 +6,7 @@ define ["jquery", "jquery.ba-bbq", "amplify.core"], ($) ->
             @data = @element.data()
 
         transform_links: () ->
+            console.log('transforming anchors')
             anchors = @element.find('a')
             for anchor in anchors
                 anchor = $(anchor)
@@ -14,15 +15,17 @@ define ["jquery", "jquery.ba-bbq", "amplify.core"], ($) ->
                 anchor.attr('href', '#'+url)
             
             $(@element).delegate('a', 'click', (event) =>
+                console.log('a.click triggered')
                 event.preventDefault()
-                url = $(this).attr('href').split('#')[1]
+                url = $(event.target).attr('href').split('#')[1]
                 @push_url(url)
-                @data = this_pagelet.element.data()
+                @data = @element.data()
                 false
             )
             @
 
         transform_forms: () ->
+            console.log('transforming forms')
             $(@element).delegate('form', 'submit', (event) =>
                 event.preventDefault()
                 @post(event.target)
@@ -31,12 +34,14 @@ define ["jquery", "jquery.ba-bbq", "amplify.core"], ($) ->
 
         push_url: (url) ->
             id = @element.attr('id')
+            console.log('pagelet.push - url: '+url+'; id: '+id)
             state = {}
             state[id] = url
             $.bbq.pushState(state)
             @
 
         load: (url) ->
+            console.log('pagelet.load - url: '+url)
             url = @_get_pagelet_url(url)
             if (url?) and url != @data.location
                 url = @_build_url(url)
@@ -86,6 +91,7 @@ define ["jquery", "jquery.ba-bbq", "amplify.core"], ($) ->
             @element.parents('.pagelet-wrapper').replaceWith(new_pagelet)
             @element = new_pagelet.find('.pagelet')
             @data = @element.data()
+            console.log('pagelet publishing ampcms.pageletload')
             amplify.publish('ampcms.pageletload', this, @data.application)
             @
 
