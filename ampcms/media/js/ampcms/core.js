@@ -104,6 +104,9 @@ define(['ampcms/pagelet', 'order!jquery', 'order!ampcms/jquery.ba-bbq'], functio
 					}
 					return ret;
 				},
+				replace : function(element, html) {
+					return jQuery(element).replaceWith(html);
+				},
 				data : function(element, key, data) {
 					var ret;
 					if( typeof key === 'undefined') {

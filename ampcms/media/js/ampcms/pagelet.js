@@ -166,6 +166,7 @@ define(['ampcms/sandbox'], function(sandbox) {
 						callback = function(response) {
 							thiz.push_url(response.location);
 							thiz._load_html(response.html);
+							thiz._transform_links();
 						};
 					}
 					return core.ajax.form_post(form, callback);
@@ -193,7 +194,8 @@ define(['ampcms/sandbox'], function(sandbox) {
 					return core.history.push_state(pagelet_selector, url);
 				},
 				_load_html : function(html) {
-					return core.dom.html(CONTAINER, html);
+					core.dom.replace(CONTAINER, html);
+					CONTAINER = core.dom.find('#' + pagelet_selector);
 				},
 				_transform_links : function() {
 					var thiz = this, anchor, anchors, href, _i, _len;
