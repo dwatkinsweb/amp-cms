@@ -1,7 +1,9 @@
-<div xmlns:py="http://genshi.edgewall.org/"
-	 class="pagelet-wrapper ${data_model.classes}" 
-	 id="${data_model.name}-wrapper">
-	<div class="pagelet-styler ${data_model.classes}" id="${data_model.name}-styler">
-		<content> </content>
+<html xmlns:py="http://genshi.edgewall.org/"
+	  xmlns:xi="http://www.w3.org/2001/XInclude"
+	  py:strip="">
+	<div class="pagelet ${data_model.classes}" id="${data_model.name}-pagelet" py:attrs="data_tags">
+		<div class="pagelet-styler ${data_model.classes}" id="${data_model.name}-styler">
+			<content> </content>
+		</div>
 	</div>
-</div>
+</html>

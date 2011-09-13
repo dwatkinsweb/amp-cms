@@ -1,7 +1,7 @@
 <html xmlns:py="http://genshi.edgewall.org/"
 	  xmlns:xi="http://www.w3.org/2001/XInclude"
 	  py:strip="">
-	<div py:match="content" class="pagelet simple-pagelet" id="${data_model.name}-pagelet" py:attrs="data_tags">
+	<div py:match="content" class="pagelet-content simple-pagelet" id="${data_model.name}-content">
 		<div class="pagelet-title">${data_model.title}</div>
 		<div class="pagelet-content">${content}</div>
 	</div>
