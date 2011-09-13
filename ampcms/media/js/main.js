@@ -2,7 +2,8 @@ require.config({
 	baseUrl: '/media/js',
 	paths: {
 		'jquery' : 'https://ajax.googleapis.com/ajax/libs/jquery/1.6.3/jquery.min',
-		'ampcms' : '/media/ampcms/js/ampcms'
+		'ampcms' : '/media/ampcms/js/ampcms',
+		'order' : '/media/ampcms/js/ampcms/order'
 	}
 });
 

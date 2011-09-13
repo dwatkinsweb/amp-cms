@@ -1,6 +1,6 @@
 // core needs to be in the global scope to ensure that it's the same for all sandboxes/pagelets
 var core = null;
-define(['ampcms/pagelet', 'ampcms/order!jquery', 'ampcms/order!ampcms/jquery.ba-bbq'], function(pagelet) {
+define(['ampcms/pagelet', 'order!jquery', 'order!ampcms/jquery.ba-bbq'], function(pagelet) {
 	var pagelet_data = {}
 	debug = true;
 
