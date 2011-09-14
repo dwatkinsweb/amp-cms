@@ -87,10 +87,10 @@ define(['ampcms/sandbox'], function(sandbox) {
 						if(url != null && url !== data.location) {
 							core.ajax.get(url, function(response) {
 								thiz.unregister_all();
-								if(response.css) {
+								if (response.css.length > 0) {
 									core.load_css(response.css);
 								}
-								if(response.js) {
+								if (response.js.length > 0) {
 									core.load_js(response.js, function(new_pagelet) {
 										thiz._load_html(response.html);
 										thiz._transform_links();
