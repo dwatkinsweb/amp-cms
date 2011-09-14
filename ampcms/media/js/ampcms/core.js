@@ -1,9 +1,9 @@
 // core needs to be in the global scope to ensure that it's the same for all sandboxes/pagelets
 var core = null;
 define(['ampcms/pagelet', 'order!jquery', 'order!ampcms/jquery.ba-bbq'], function(pagelet) {
-	var pagelet_data = {}
-	debug = true;
-
+	var pagelet_data = {};
+	var loaded_css = [];
+	var debug = true;
 	if(core === null) {
 		core = {
 			debug : function(on) {
@@ -15,6 +15,46 @@ define(['ampcms/pagelet', 'order!jquery', 'order!ampcms/jquery.ba-bbq'], functio
 				} else {
 					// send to the server
 				}
+			},
+			load_css : function(css) {
+				this.log(1, 'loading css: ' + css);
+				var _i, _len, _css_file;
+				for (_i = 0, _len = css.length; _i < _len; _i++) {
+					css_file = css[_i];
+					if (!this.utils.in_array(loaded_css, css_file)) {
+						if (css_file != null) {
+							if (document.createStyleSheet) {
+								document.createStyleSheet(css_file);
+							} else {
+								this.dom.append(this.dom.find('head'), "<link rel='stylesheet' href='" + css_file + "' type='text/css' />");
+							}
+						}
+						loaded_css.push(css_file);
+					}
+				}
+			},
+			load_js : function(js, callback) {
+				this.log(1, 'loading js: ' + js);
+				require(js, callback);
+			},
+			// Pagelet Handling
+			load_pagelets : function() {
+				var pagelet_id, new_pagelet, pagelet_element, pagelet_elements, _i, _len, thiz = this;
+				pagelet_elements = this.page.find('.pagelet');
+				for (_i = 0, _len = pagelet_elements.length; _i < _len; _i++) {
+					pagelet_element = pagelet_elements[_i];
+					pagelet_id = pagelet_element.id;
+					this.log(1, "loading pagelet " + pagelet_id + " : " + pagelet_element);
+					pagelet_data[pagelet_id] = pagelet.create(this, pagelet_id);
+				}
+				$(window).bind('hashchange', function() {
+					var pagelet_id, pagelet, pagelet_state;
+					for (pagelet_id in pagelet_data) {
+						pagelet = pagelet_data[pagelet_id];
+						pagelet_state = thiz.history.get_state(pagelet_id);
+						pagelet.load(pagelet_state);
+					}
+				});
 			},
 			// Event Handling Methods
 			events : {
@@ -104,6 +144,9 @@ define(['ampcms/pagelet', 'order!jquery', 'order!ampcms/jquery.ba-bbq'], functio
 					}
 					return ret;
 				},
+				append : function(element, html) {
+					return jQuery(element).append(jQuery(html));
+				},
 				replace : function(element, html) {
 					return jQuery(element).replaceWith(html);
 				},
@@ -139,15 +182,29 @@ define(['ampcms/pagelet', 'order!jquery', 'order!ampcms/jquery.ba-bbq'], functio
 					} else {
 						// log wrong arguments
 					}
-				},
+				}
 			},
 			// Ajax Methods
 			ajax : {
+				ajax : function(url, config) {
+					jQuery.ajax(url, config);
+				},
 				get : function(url, callback) {
 					jQuery.get(url, function(response) {
 						response = jQuery.parseJSON(response);
 						callback(response);
 					});
+				},
+				post : function(url, data, callback) {
+					jQuery.post(url, data, function(response) {
+						response = jQuery.parseJSON(response);
+						callback(response);
+					});
+				},
+				post_form : function(form, url, callback) {
+					form = jQuery(form)
+					var data = form.serialize();
+					this.post(url, data, callback); 
 				}
 			},
 			// Utility Methods
@@ -157,6 +214,12 @@ define(['ampcms/pagelet', 'order!jquery', 'order!ampcms/jquery.ba-bbq'], functio
 				},
 				is_object : function(obj) {
 					return jQuery.isPlainObject(obj);
+				},
+				in_array : function(array, value) {
+					return jQuery.inArray(value, array) >= 0;
+				},
+				index_of : function(array, value) {
+					return jQuery.inArray(value, array);
 				},
 				extend : function(object1, object2) {
 					return jQuery.extend(object1, object2);
@@ -168,6 +231,9 @@ define(['ampcms/pagelet', 'order!jquery', 'order!ampcms/jquery.ba-bbq'], functio
 						}
 					}
 					return object1
+				},
+				merge : function(first, second) {
+					return jQuery.merge(first, second);
 				}
 			},
 			// Hash Methods
@@ -180,26 +246,7 @@ define(['ampcms/pagelet', 'order!jquery', 'order!ampcms/jquery.ba-bbq'], functio
 				get_state : function(id) {
 					return jQuery.bbq.getState(id);
 				}
-			},
-			// Pagelet Handling
-			load_pagelets : function() {
-				var pagelet_id, new_pagelet, pagelet_element, pagelet_elements, _i, _len, thiz = this;
-				pagelet_elements = this.page.find('.pagelet');
-				for (_i = 0, _len = pagelet_elements.length; _i < _len; _i++) {
-					pagelet_element = pagelet_elements[_i];
-					pagelet_id = pagelet_element.id;
-					this.log(1, "loading pagelet " + pagelet_id + " : " + pagelet_element);
-					pagelet_data[pagelet_id] = pagelet.create(this, pagelet_id);
-				}
-				$(window).bind('hashchange', function() {
-					var pagelet_id, pagelet, pagelet_state;
-					for (pagelet_id in pagelet_data) {
-						pagelet = pagelet_data[pagelet_id];
-						pagelet_state = thiz.history.get_state(pagelet_id);
-						pagelet.load_url(pagelet_state);
-					}
-				});
-			},
+			}
 		};
 		core.page = core.dom.find('#page');
 	}

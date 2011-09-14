@@ -1,15 +1,14 @@
 define(function() {
 	return {
 		create : function(paglet, module_selector) {
+			pagelet.log(1, 'creating sandbox for module ' + module_selector);
 			var CONTAINER = paglet.find('#' + module_selector);
 			return {
 				// Sandbox Methods
-				find : function(selector) {
-					return CONTAINER.find(selector);
-				},
 				log : function(severity, message) {
 					paglet.log(severity, message);
 				},
+				// Event Handling
 				publish : function(event) {
 					pagelet.publish(event);
 				},
@@ -28,6 +27,32 @@ define(function() {
 				unsubscribe_global : function(events) {
 					pagelet.unsubscribe_global(events, module_selector);
 				},
+	            bind : function (element, type, fn) {
+	                pagelet.bind(element, type, fn);           
+	            },
+	            unbind : function (element, type, fn) {
+	                pagelet.unbind(element, type, fn);              
+	            },
+	            // Ajax Handling
+	            post_form : function (form, callback) {
+	            	pagelet.post_form(form, callback);
+	            },
+	            post : function(url, data, callback) {
+	            	pagelet.post(url, data, callback);
+	            },
+	            get : function(url, data, callback) {
+	            	pagelet.get(url, data, callback);
+	            },
+	            ajax : function(url, config) {
+	            	pagelet.ajax(url, config);
+	            },
+	            // Dom Handling
+				find : function(selector) {
+					return CONTAINER.find(selector);
+				},
+				data : function(selector) {
+					return pagelet.data(selector);
+				}
 			};
 		}
 	};

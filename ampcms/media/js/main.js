@@ -6,7 +6,6 @@ require.config({
 		'order' : '/media/ampcms/js/ampcms/order'
 	}
 });
-
 require(['ampcms/core'], function(core) {
 	return require.ready(function() {
 		core.load_pagelets();
