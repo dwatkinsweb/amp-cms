@@ -148,13 +148,6 @@ define(['ampcms/sandbox'], function(sandbox) {
 						return false;
 					});
 				},
-				// Dom Handling
-				find : function(selector) {
-					return CONTAINER.find(selector);
-				},
-				data : function(selector, key, data) {
-					return core.dom.data(selector, key, data);
-				},
 				// Event Handling Methods
 				publish : function(event) {
 					for(module in module_data) {
@@ -263,7 +256,21 @@ define(['ampcms/sandbox'], function(sandbox) {
 	            },
 	            ajax : function(url, config) {
 	            	core.ajax.ajax(url, config);
-	            }
+	            },
+				// Dom Handling
+				find : function(selector) {
+					return CONTAINER.find(selector);
+				},
+				filter : function(element, selector) {
+					return core.dom.filter(element, selector);
+				},
+				data : function(selector, key, data) {
+					return core.dom.data(selector, key, data);
+				},
+				// Utilities
+				in_array: function(array, value) {
+					return core.utils.in_array(array, value);
+				}
 			};
 			pagelet.load();
 			return pagelet;

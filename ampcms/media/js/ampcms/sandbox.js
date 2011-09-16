@@ -50,8 +50,15 @@ define(function() {
 				find : function(selector) {
 					return CONTAINER.find(selector);
 				},
-				data : function(selector) {
-					return pagelet.data(selector);
+				filter : function(element, selector) {
+					return pagelet.filter(element, selector);
+				},
+				data : function(selector, key, data) {
+					return pagelet.data(selector, key, data);
+				},
+				// Utilities
+				in_array: function(array, value) {
+					return pagelet.in_array(array, value);
 				}
 			};
 		}

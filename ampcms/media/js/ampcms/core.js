@@ -126,6 +126,9 @@ define(['ampcms/pagelet', 'order!jquery', 'order!ampcms/jquery.ba-bbq'], functio
 					}
 					return ret;
 				},
+				filter : function(element, selector) {
+					return jQuery(element).filter(selector).get();
+				},
 				attr : function(element, attr, value) {
 					var ret;
 					if( typeof value === 'undefined') {
