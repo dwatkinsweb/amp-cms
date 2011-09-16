@@ -56,6 +56,9 @@ define(function() {
 				data : function(selector, key, data) {
 					return pagelet.data(selector, key, data);
 				},
+				remove_data : function(selector, key) {
+					pagelet.remove_data(selector, key);
+				},
 				// Utilities
 				in_array: function(array, value) {
 					return pagelet.in_array(array, value);

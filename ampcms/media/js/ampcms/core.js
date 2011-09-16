@@ -164,6 +164,9 @@ define(['ampcms/pagelet', 'order!jquery', 'order!ampcms/jquery.ba-bbq'], functio
 					}
 					return ret;
 				},
+				remove_data : function(element, key) {
+					jQuery(element).removeData(key);
+				},
 				bind : function(element, event, callback) {
 					if(element && event) {
 						if( typeof event === 'function') {

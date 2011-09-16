@@ -267,6 +267,9 @@ define(['ampcms/sandbox'], function(sandbox) {
 				data : function(selector, key, data) {
 					return core.dom.data(selector, key, data);
 				},
+				remove_data : function(selector, key) {
+					core.dom.remove_data(selector, key);
+				},
 				// Utilities
 				in_array: function(array, value) {
 					return core.utils.in_array(array, value);
