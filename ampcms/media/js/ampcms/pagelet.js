@@ -152,8 +152,8 @@ define(['ampcms/sandbox'], function(sandbox) {
 				find : function(selector) {
 					return CONTAINER.find(selector);
 				},
-				data : function(selector) {
-					return core.dom.data(selector);
+				data : function(selector, key, data) {
+					return core.dom.data(selector, key, data);
 				},
 				// Event Handling Methods
 				publish : function(event) {
