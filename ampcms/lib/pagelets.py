@@ -144,7 +144,7 @@ class ApplicationPagelet(BasePagelet):
     def _get_context(self, include_content=None):
         '''
         Builds the context for the application
-        @param include_content: Whether or not to load the application content. By default, just renders the frame.
+        @param include_content: Application content.
         '''
         context = super(ApplicationPagelet, self)._get_context()
         if include_content is not None:
