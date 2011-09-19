@@ -30,6 +30,9 @@ class BaseLayout(BaseContentType):
         return children
 
     def _build_menus(self):
+        '''
+        Build the main and sub menus for the application based on modules and pages
+        '''
         menus = {}
         # Build main menu
         menus[MenuTypes.MAIN] = MenuPagelet(menu_label=MenuTypes.MAIN, selected_item=self._page._data_model.module.title,

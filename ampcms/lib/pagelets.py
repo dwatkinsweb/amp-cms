@@ -133,19 +133,29 @@ class ApplicationPagelet(BasePagelet):
 
     def _to_stream(self, include_content=False):
         '''
-        Convert the layout into a Genshi Stream
+        Renders the pagelet as a genshi stream
+        @param include_content: Whether or not to load the application content. By default, just renders the frame.
         '''
         template = self._get_template()
         context = self._get_context(include_content)
         return render_to_stream(template, context)
 
     def _get_context(self, include_content=False):
+        '''
+        Builds the context for the application
+        @param include_content: Whether or not to load the application content. By default, just renders the frame.
+        '''
         context = super(ApplicationPagelet, self)._get_context()
         if include_content:
             context['content'] = self._build_content()
         return context
     
     def json(self, process_url=None):
+        '''
+        Returns the content as a json object be parsed and loaded in javascript
+        @param process_url: url of the application to be loaded
+        '''
+        # TODO: there needs to be a way for methods to be able to return their response as is.
         if process_url is not None:
             self.process_url = process_url
         html = self.html(include_content=True)
@@ -187,6 +197,9 @@ class ApplicationPagelet(BasePagelet):
             raise
 
     def _get_html_data(self):
+        '''
+        Build the html data tags
+        '''
         data = super(ApplicationPagelet, self)._get_html_data()
         data.update({C.HTML_DATA_TAG_KEY_STARTING_URL : self._data_model.starting_url if self._data_model.starting_url else '/',
                      C.HTML_DATA_TAG_KEY_LOCATION: self.process_url,
