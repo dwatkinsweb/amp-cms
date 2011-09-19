@@ -1,5 +1,6 @@
 from ampcms.models import Site, get_module_and_page, get_user_module_and_page
 from ampcms.lib.exceptions import PageDoesNotExist
+from ampcms.lib.response import AMPCMSAjaxResponse, AMPCMSMedia
 from ampcms.conf import settings
 from django.utils.functional import wraps
 from django.utils.decorators import available_attrs
@@ -72,12 +73,15 @@ def ampcms_view(template=None, css_files=None, js_files=None):
                 if template is not None:
                     kwargs['template'] = template
                 response = view_func(request, *args, **kwargs)
-                class AMPCMSMedia:
-                    css = css_files
-                    js = js_files
-                response.ampcms_media = AMPCMSMedia
+                response.ampcms_media = AMPCMSMedia(css_files, js_files)
                 return response
         return wraps(view_func)(wrapped_view)
     return decorator
-                
-                
+
+def ampcms_ajax_view(view_func):
+    def wrapped_view(request, *args, **kwargs):
+        response = view_func(request, *args, **kwargs)
+        response = AMPCMSAjaxResponse(response)
+        return response
+    return wraps(view_func)(wrapped_view)
+    

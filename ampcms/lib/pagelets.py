@@ -7,6 +7,7 @@ from django.core.urlresolvers import resolve
 from ampcms.lib.content_type import BaseContentType
 from ampcms.lib.content_type_mapper import ContentTypeMapper
 from ampcms.lib.application_mapper import application_mapper
+from ampcms.lib.response import AMPCMSAjaxResponse, AMPCMSMedia
 from ampcms import const as C
 
 import json
@@ -128,26 +129,26 @@ class ApplicationPagelet(BasePagelet):
         self._template = template
         self.process_url = None
         
-    def html(self, include_content=False):
+    def html(self, include_content=None):
         return self._to_stream(include_content).render()
 
-    def _to_stream(self, include_content=False):
+    def _to_stream(self, include_content=None):
         '''
         Renders the pagelet as a genshi stream
-        @param include_content: Whether or not to load the application content. By default, just renders the frame.
+        @param include_content: Application content.
         '''
         template = self._get_template()
         context = self._get_context(include_content)
         return render_to_stream(template, context)
 
-    def _get_context(self, include_content=False):
+    def _get_context(self, include_content=None):
         '''
         Builds the context for the application
         @param include_content: Whether or not to load the application content. By default, just renders the frame.
         '''
         context = super(ApplicationPagelet, self)._get_context()
-        if include_content:
-            context['content'] = self._build_content()
+        if include_content is not None:
+            context['content'] = include_content
         return context
     
     def json(self, process_url=None):
@@ -155,16 +156,19 @@ class ApplicationPagelet(BasePagelet):
         Returns the content as a json object be parsed and loaded in javascript
         @param process_url: url of the application to be loaded
         '''
-        # TODO: there needs to be a way for methods to be able to return their response as is.
         if process_url is not None:
             self.process_url = process_url
-        html = self.html(include_content=True)
-        return json.dumps({C.JSON_KEY_NAME: self._data_model.name,
-                           C.JSON_KEY_LOCATION: self.process_url,
-                           C.JSON_KEY_HTML: Markup(html),
-                           C.JSON_KEY_CSS: self._build_css(),
-                           C.JSON_KEY_JS: self._build_js(),
-                           })
+        application_content = self._build_content()
+        if isinstance(application_content, AMPCMSAjaxResponse):
+            return application_content.response
+        else:
+            html = self.html(include_content=application_content)
+            return json.dumps({C.JSON_KEY_NAME: self._data_model.name,
+                               C.JSON_KEY_LOCATION: self.process_url,
+                               C.JSON_KEY_HTML: Markup(html),
+                               C.JSON_KEY_CSS: self._build_css(),
+                               C.JSON_KEY_JS: self._build_js(),
+                               })
     
     def _build_content(self, process_url=None):
         '''
@@ -185,9 +189,13 @@ class ApplicationPagelet(BasePagelet):
             self.request.is_ampcms = True
             response = view(self.request, *args, **kwargs)
             if isinstance(response, HttpResponseRedirect):
+                # If it's a redirect, build the content based on new url
                 # TODO: I don't like the way this is removing the prefix out of the url but couldn't think of anything better atm.
                 self.process_url = response['location'].replace('/%s' % application.url_prefix, '', 1)
                 return self._build_content()
+            elif isinstance(response, AMPCMSAjaxResponse):
+                # If it's an AMPCMSAjaxResponse, return as is
+                return response
             if hasattr(response, 'ampcms_media'):
                 self.view_css = response.ampcms_media.css
                 self.view_js = response.ampcms_media.js
