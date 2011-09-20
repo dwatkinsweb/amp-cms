@@ -270,6 +270,18 @@ define(['ampcms/sandbox'], function(sandbox) {
 				remove_data : function(selector, key) {
 					core.dom.remove_data(selector, key);
 				},
+				add_class : function(selector, css) {
+					core.dom.add_class(selector, css);
+				},
+				remove_class : function(selector, css) {
+					core.dom.remove_class(selector, css);
+				},
+				has_class : function(selector, css) {
+					return core.dom.has_class(selector, css);
+				},
+				html : function(selector, html) {
+					core.dom.html(selector, html);
+				},
 				// Utilities
 				in_array: function(array, value) {
 					return core.utils.in_array(array, value);

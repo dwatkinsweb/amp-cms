@@ -188,6 +188,15 @@ define(['ampcms/pagelet', 'order!jquery', 'order!ampcms/jquery.ba-bbq'], functio
 					} else {
 						// log wrong arguments
 					}
+				},
+				add_class : function(selector, css) {
+					jQuery(selector).addClass(css);
+				},
+				remove_class : function(selector, css) {
+					jQuery(selector).removeClass(css);
+				},
+				has_class : function(selector, css) {
+					return jQuery(selector).hasClass(css);
 				}
 			},
 			// Ajax Methods

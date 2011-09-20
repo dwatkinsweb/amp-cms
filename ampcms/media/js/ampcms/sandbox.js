@@ -59,6 +59,22 @@ define(function() {
 				remove_data : function(selector, key) {
 					pagelet.remove_data(selector, key);
 				},
+				add_class : function(selector, css) {
+					pagelet.add_class(selector, css);
+				},
+				remove_class : function(selector, css) {
+					pagelet.remove_class(selector, css);
+				},
+				has_class : function(selector, css) {
+					return pagelet.has_class(selector, css);
+				},
+				html : function(selector, html) {
+					if (typeof html === 'undefined') {
+						html = selector;
+						selector = CONTAINER;
+					}
+					pagelet.html(selector, html);
+				},
 				// Utilities
 				in_array: function(array, value) {
 					return pagelet.in_array(array, value);
