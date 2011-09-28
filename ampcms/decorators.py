@@ -13,7 +13,7 @@ log = logging.getLogger(__name__)
 def user_passes_test(function, login_url=settings.AMPCMS_LOGIN_URL, public_url=settings.AMPCMS_PUBLIC_URL, permission_denied_url=settings.AMPCMS_PERMISSION_DENIED_URL):
     def _decorator(view_func):
         def _wrapped_view(request, *args, **kwargs):
-            site = Site.objects.get_current()
+            site = Site.objects.get_by_request(request)
             if not site.private:
                 # Attempt to load module and page
                 try:

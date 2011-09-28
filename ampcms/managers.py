@@ -79,10 +79,10 @@ class PageletManager(Manager):
 class SiteManager(DjangoSiteManager):
     def get_by_request(self, request):
         host = request.get_host()
-        current_site = self.get(domain=host)
+        current_site = self.get_query_set().filter(domain=host)
         if settings.AMPCMS_CACHING:
             current_site.cache(timeout=settings.AMPCMS_CACHING_TIMEOUT)
-        return current_site
+        return current_site[0]
 
 if settings.AMPCMS_CACHING:
     from caching.base import CachingManager
