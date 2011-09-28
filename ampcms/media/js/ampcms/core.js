@@ -150,6 +150,9 @@ define(['ampcms/pagelet', 'order!jquery', 'order!ampcms/jquery.ba-bbq'], functio
 				append : function(element, html) {
 					return jQuery(element).append(jQuery(html));
 				},
+				remove : function(selector) {
+					jQuery(selector).remove();
+				},
 				replace : function(element, html) {
 					return jQuery(element).replaceWith(html);
 				},

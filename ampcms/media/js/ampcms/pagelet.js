@@ -86,6 +86,7 @@ define(['ampcms/sandbox'], function(sandbox) {
 						core.log(1, 'loading url: ' + url);
 						if(url != null && url !== data.location) {
 							core.ajax.get(url, function(response) {
+								core.log(1, response);
 								thiz.unregister_all();
 								if (response.css.length > 0) {
 									core.load_css(response.css);
@@ -219,6 +220,7 @@ define(['ampcms/sandbox'], function(sandbox) {
 					// Set a default callback to replace the current pagelet with the new html
 					if (typeof callback === 'undefined') {
 						callback = function(response) {
+							core.log(1, response);
 							if (response.location == thiz._get_url()) {
 								thiz.unregister_all();
 								if(response.css) {
@@ -281,6 +283,12 @@ define(['ampcms/sandbox'], function(sandbox) {
 				},
 				html : function(selector, html) {
 					core.dom.html(selector, html);
+				},
+				remove : function(selector) {
+					core.dom.remove(selector);
+				},
+				append : function(selector, child) {
+					core.dom.append(selector, child);
 				},
 				// Utilities
 				in_array: function(array, value) {

@@ -75,6 +75,12 @@ define(function() {
 					}
 					pagelet.html(selector, html);
 				},
+				remove : function(selector) {
+					pagelet.remove(selector);
+				},
+				append : function(selector, child) {
+					pagelet.append(selector, child);
+				},
 				// Utilities
 				in_array: function(array, value) {
 					return pagelet.in_array(array, value);
