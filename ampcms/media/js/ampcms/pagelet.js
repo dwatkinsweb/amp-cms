@@ -216,7 +216,7 @@ define(['ampcms/sandbox'], function(sandbox) {
 				// Ajax Handling
 				post_form : function(form, callback) {
 					core.log(1, 'pagelet posting form: ' + form);
-					var thiz = this, form_action;
+					var thiz = this, form_action, page_data = core.dom.data(core.page);
 					// Set a default callback to replace the current pagelet with the new html
 					if (typeof callback === 'undefined') {
 						callback = function(response) {
@@ -244,10 +244,12 @@ define(['ampcms/sandbox'], function(sandbox) {
 					}
 					form_action = core.dom.attr(form, 'action');
 					if(!form_action) {
-						form_action = this._build_url(this._get_url());
-					} else {
-						form_action = '/pagelet' + this.page.data.url + form_action;
+						form_action = this._get_url();
 					}
+					form_action = this._build_url(form_action);
+					// } else {
+						// form_action = '/pagelet' + page_data.url + form_action;
+					// }
 					return core.ajax.post_form(form, form_action, callback);
 				},
 	            post : function(url, data, callback) {
