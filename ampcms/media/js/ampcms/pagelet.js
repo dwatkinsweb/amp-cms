@@ -134,7 +134,7 @@ define(['ampcms/sandbox'], function(sandbox) {
 				},
 				_transform_links : function() {
 					var thiz = this, anchor, anchors, href, _i, _len;
-					anchors = CONTAINER.find('a');
+					anchors = CONTAINER.find('a[target!=_blank]');
 					for( _i = 0, _len = anchors.length; _i < _len; _i++) {
 						anchor = anchors[_i];
 						href = core.dom.attr(anchor, 'href');
