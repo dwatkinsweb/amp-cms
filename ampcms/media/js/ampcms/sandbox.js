@@ -8,6 +8,9 @@ define(function() {
 				log : function(severity, message) {
 					paglet.log(severity, message);
 				},
+				push_url : function(url) {
+					pagelet.push_url(url);
+				},
 				// Event Handling
 				publish : function(event) {
 					pagelet.publish(event);
