@@ -51,21 +51,39 @@ define(function() {
 					return CONTAINER.find(selector);
 				},
 				filter : function(element, selector) {
+					if (typeof selector == 'string') {
+						selector = CONTAINER.find(selector);
+					}
 					return pagelet.filter(element, selector);
 				},
 				data : function(selector, key, data) {
+					if (typeof selector == 'string') {
+						selector = CONTAINER.find(selector);
+					}
 					return pagelet.data(selector, key, data);
 				},
 				remove_data : function(selector, key) {
+					if (typeof selector == 'string') {
+						selector = CONTAINER.find(selector);
+					}
 					pagelet.remove_data(selector, key);
 				},
 				add_class : function(selector, css) {
+					if (typeof selector == 'string') {
+						selector = CONTAINER.find(selector);
+					}
 					pagelet.add_class(selector, css);
 				},
 				remove_class : function(selector, css) {
+					if (typeof selector == 'string') {
+						selector = CONTAINER.find(selector);
+					}
 					pagelet.remove_class(selector, css);
 				},
 				has_class : function(selector, css) {
+					if (typeof selector == 'string') {
+						selector = CONTAINER.find(selector);
+					}
 					return pagelet.has_class(selector, css);
 				},
 				html : function(selector, html) {
@@ -73,12 +91,21 @@ define(function() {
 						html = selector;
 						selector = CONTAINER;
 					}
+					if (typeof selector == 'string') {
+						selector = CONTAINER.find(selector);
+					}
 					pagelet.html(selector, html);
 				},
 				remove : function(selector) {
+					if (typeof selector == 'string') {
+						selector = CONTAINER.find(selector);
+					}
 					pagelet.remove(selector);
 				},
 				append : function(selector, child) {
+					if (typeof selector == 'string') {
+						selector = CONTAINER.find(selector);
+					}
 					pagelet.append(selector, child);
 				},
 				// Utilities
