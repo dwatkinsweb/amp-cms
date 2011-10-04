@@ -65,7 +65,7 @@ def acl_required(function=None, login_url=settings.AMPCMS_LOGIN_URL, public_url=
         return actual_decorator(function)
     return actual_decorator
 
-def ampcms_view(template=None, css_files=None, js_files=None):
+def ampcms_view(template=None, css_files=[], js_files=[]):
     def decorator(view_func):
         def wrapped_view(request, *args, **kwargs):
             # Only apply changes if coming from ampcms
