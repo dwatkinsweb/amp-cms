@@ -192,6 +192,28 @@ define(['ampcms/pagelet', 'order!jquery', 'order!ampcms/jquery.ba-bbq'], functio
 						// log wrong arguments
 					}
 				},
+				live : function(element, event, callback) {
+					if(element && event) {
+						if( typeof event === 'function') {
+							callback = event;
+							event = 'click';
+						}
+						jQuery(element).live(event, callback);
+					} else {
+						// log wrong arguments
+					}
+				},
+				die : function(element, event, callback) {
+					if(element && event) {
+						if( typeof event === 'function') {
+							callback = event;
+							event = 'click';
+						}
+						jQuery(element).die(event, callback);
+					} else {
+						// log wrong arguments
+					}
+				},
 				add_class : function(selector, css) {
 					jQuery(selector).addClass(css);
 				},

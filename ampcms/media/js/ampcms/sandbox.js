@@ -36,6 +36,12 @@ define(function() {
 	            unbind : function (element, type, fn) {
 	                pagelet.unbind(element, type, fn);              
 	            },
+	            live : function (element, type, fn) {
+	                pagelet.live(element, type, fn);           
+	            },
+	            die : function (element, type, fn) {
+	                pagelet.die(element, type, fn);              
+	            },
 	            // Ajax Handling
 	            post_form : function (form, callback) {
 	            	pagelet.post_form(form, callback);

@@ -213,6 +213,12 @@ define(['ampcms/sandbox'], function(sandbox) {
 				unbind : function(element, type, fn) {
 					core.dom.unbind(element, type, fn);
 				},
+	            live : function (element, type, fn) {
+	                core.dom.live(element, type, fn);           
+	            },
+	            die : function (element, type, fn) {
+	                core.dom.die(element, type, fn);              
+	            },
 				// Ajax Handling
 				post_form : function(form, callback) {
 					core.log(1, 'pagelet posting form: ' + form);
