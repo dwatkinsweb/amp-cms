@@ -2,7 +2,7 @@ var ampcms_config = function() {
 	return {
 		require : {
 			paths : {
-				'jquery' : 'https://ajax.googleapis.com/ajax/libs/jquery/1.6.3/jquery.min',
+				'jquery' : 'https://ajax.googleapis.com/ajax/libs/jquery/1.6.3/jquery.min'
 				// TODO: for some reason the jquery one doesn't seem to notice that jquery is loaded. The regular one seems to work fine however.
 				//'libs/history' : '/media/js/libs/jquery/jquery.history',
 			},
@@ -10,7 +10,7 @@ var ampcms_config = function() {
 		},
 		ampcms : {
 			config : {
-				debug : true,
+				debug : true
 			},
 			extensions : {
 				core : 'ampcms/ext/core',

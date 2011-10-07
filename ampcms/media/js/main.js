@@ -15,7 +15,7 @@ var ampcms = function() {
 				if (typeof destination[k] === 'object' && typeof source[k] === 'object') {
 					destination[k] = extend(destination[k], source[k]);
 				} else {
-					destination[k] = source[k]
+					destination[k] = source[k];
 				}
 			}
 		}
