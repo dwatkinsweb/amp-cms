@@ -29,7 +29,7 @@ define(function() {
 				},
 				unsubscribe_global : function(events) {
 					pagelet.unsubscribe_global(events, module_selector);
-				},
+				}
 			};
 			sandbox = pagelet.extend(sandbox, this.extension.create(pagelet, CONTAINER));
 			return sandbox;

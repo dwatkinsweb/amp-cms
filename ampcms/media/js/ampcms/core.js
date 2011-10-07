@@ -1,3 +1,14 @@
+/*
+ * FIXME: The following functions need to be implemented in a non library specific way or by using a smaller micro library:
+ *  - dom.find
+ *  - dom.data
+ *  - dom.replace
+ *  - dom.attr
+ *  - ajax.get
+ *  - utils.is_object
+ *  - utils.retract
+ */
+
 // TODO: currently, I think core needs to be in the global scope to ensure that it's the same for all sandboxes/pagelets
 var core = null;
 define(['require', 'ampcms/pagelet', 'ampcms/sandbox', 'libs/history'], function(require, pagelet, sandbox) {
@@ -113,7 +124,20 @@ define(['require', 'ampcms/pagelet', 'ampcms/sandbox', 'libs/history'], function
 					HistoryPlugin.replaceState(data, null, new_url);
 				},
 				get_state : function(id) {
-					var state = HistoryPlugin.getState();
+					var state = HistoryPlugin.getState(), data = state.data, query_string;
+					if (core.utils.is_empty_object(data)) {
+						query_string = window.location.search;
+						if (query_string === "") {
+							query_string = window.location.hash;
+							if (query_string.length > 1) {
+								query_string = query_string.substring(1);
+							}
+						}
+						if (query_string.length > 1) {
+							data = core.parse_query_string(query_string);
+						}
+						HistoryPlugin.pushState(data, null, query_string);
+					}
 					if (typeof id !== 'undefined') {
 						state = state.data[id];
 					}
@@ -137,6 +161,47 @@ define(['require', 'ampcms/pagelet', 'ampcms/sandbox', 'libs/history'], function
 					HistoryPlugin.Adapter.bind(target, event, callback);
 				}
 			},
+			utils : {
+				is_empty_object : function(obj) {
+				    for (var key in obj) {
+				    	if (obj.hasOwnProperty(key)) {
+				    		return false;
+				    	}
+				    }
+				    return true;
+				}
+			},
+			decode : function(s) {
+				try {
+					return decodeURIComponent(s).replace(/\r\n|\r|\n/g, "\r\n");
+				} catch (e) {
+					return "";
+				}	
+			},
+			parse_query_string : function(query_string) {
+				var multimap = {};
+				if (query_string.length > 1) {
+					query_string = query_string.substring(1);
+					query_string.replace(/([^=&]+)=([^&]*)/g, function(match, hfname, hfvalue) {
+						var name = core.decode(hfname);
+						var value = core.decode(hfvalue);
+						if (name.length > 0) {
+							if (!multimap.hasOwnProperty(name)) {
+								multimap[name] = [];
+							}
+							multimap[name].push(value);
+						}
+					});
+			    }
+			    return multimap;
+			},
+			build_query_string : function(array) {
+				var key, map = [];
+				for (key in array) {
+					map.push(key+'='+array[key]);
+				}
+				return map.join('&');
+			},
 			// Pagelet Handling
 			load_pagelets : function() {
 				var pagelet_id, new_pagelet, pagelet_element, pagelet_elements, _i, _len, thiz = this;
@@ -148,6 +213,7 @@ define(['require', 'ampcms/pagelet', 'ampcms/sandbox', 'libs/history'], function
 					pagelet_data[pagelet_id] = pagelet.create(this, pagelet_id);
 				}
 				this.history.subscribe(function() {
+					thiz.log("loading state");
 					var pagelet_id, pagelet, pagelet_state;
 					for (pagelet_id in pagelet_data) {
 						pagelet = pagelet_data[pagelet_id];
@@ -155,8 +221,10 @@ define(['require', 'ampcms/pagelet', 'ampcms/sandbox', 'libs/history'], function
 						pagelet.load(pagelet_state);
 					}
 				});
+				//HistoryPlugin.Adapter.trigger('statechange');
 			},
 			config : function(ampcms_config) {
+				this.log('loading configurations');
 				var thiz = this, extensions = [], extension_targets = [], i = 0;
 				if (typeof ampcms_config.config !== 'undefined') {
 					config = this.extend(config, ampcms_config.config);
@@ -181,11 +249,7 @@ define(['require', 'ampcms/pagelet', 'ampcms/sandbox', 'libs/history'], function
 					for (_i = 0, _len = arguments.length; _i < _len; _i++) {
 						target_object = extension_targets[_i];
 						mixin_object = arguments[_i];
-						for (var k in mixin_object) {
-							if (mixin_object.hasOwnProperty(k)) {
-								target_object[k] = mixin_object[k];
-							}
-						}
+						target_object = core.extend(target_object, mixin_object);
 					}
 					// TODO: Don't really want to add page here but need it for some stuff in pagelet.
 					thiz.page = PAGE = thiz.dom.find('#page');
@@ -196,7 +260,7 @@ define(['require', 'ampcms/pagelet', 'ampcms/sandbox', 'libs/history'], function
 				for (var k in source) {
 					if (source.hasOwnProperty(k)) {
 						if (typeof destination[k] === 'object' && typeof source[k] === 'object') {
-							destination[k] = extend(destination[k], source[k]);
+							destination[k] = core.extend(destination[k], source[k]);
 						} else {
 							destination[k] = source[k]
 						}
