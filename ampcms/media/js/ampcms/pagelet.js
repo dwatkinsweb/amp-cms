@@ -4,13 +4,14 @@ define(['ampcms/sandbox'], function(sandbox) {
 	return {
 		create : function(core, pagelet_selector) {
 			var CONTAINER = core.dom.find('#' + pagelet_selector);
-			pagelet = {
+			var pagelet = {
+				__CONTAINER : CONTAINER,
 				log : function(severity, message) {
 					core.log(severity, message);
 				},
 				// Module Handling Methods
 				register_module : function(module_id, creator) {
-					core.log(1, 'registering module ' + module_id);
+					core.log('registering module ' + module_id);
 					var temp;
 					if( typeof module_id === 'string' && typeof creator === 'function') {
 						temp = creator(sandbox.create(this, module_id));
@@ -28,7 +29,7 @@ define(['ampcms/sandbox'], function(sandbox) {
 					}
 				},
 				unregister_module : function(module_id) {
-					core.log(1, 'unregistering module ' + module_id);
+					core.log('unregistering module ' + module_id);
 					this.stop(module_id);
 					delete module_data[module_id];
 				},
@@ -41,10 +42,11 @@ define(['ampcms/sandbox'], function(sandbox) {
 					}
 				},
 				start : function(module_id) {
-					core.log(1, 'starting module ' + module_id);
-					var mod = module_data[module_id];
+					core.log('starting module ' + module_id);
+					var mod = module_data[module_id], mod_sandbox;
 					if(mod) {
-						mod.instance = mod.create(sandbox.create(this, module_id));
+						mod_sandbox = sandbox.create(this, module_id);
+						mod.instance = mod.create(mod_sandbox);
 						mod.instance.init();
 					}
 				},
@@ -57,7 +59,7 @@ define(['ampcms/sandbox'], function(sandbox) {
 					}
 				},
 				stop : function(module_id) {
-					core.log(1, 'stopping module ' + module_id);
+					core.log('stopping module ' + module_id);
 					var data = module_data[module_id];
 					if(data && data.instance) {
 						data.instance.destroy();
@@ -74,19 +76,77 @@ define(['ampcms/sandbox'], function(sandbox) {
 						}
 					}
 				},
+				// Event Handling Methods
+				publish : function(event) {
+					for(module in module_data) {
+						if(module_data.hasOwnProperty(module)) {
+							module = module_data[module];
+							if(module.events && module.events[event.type]) {
+								module.events[event.type](event.data);
+							}
+						}
+					}
+				},
+				subscribe : function(events, module) {
+					if(core.utils.is_object(events) && module) {
+						if(module_data[module]) {
+							module = module_data[module];
+							if(module.events) {
+								module.events = core.utils.extend(module.events, events);
+							} else {
+								module.events = events;
+							}
+						} else {
+							core.log(2, "Events subscribed by non existant module: " + module);
+						}
+					} else {
+						core.log(2, "Invalid parameters sent to event subscription: events: " + events + "; module: " + module);
+					}
+				},
+				unsubscribe : function(events, module) {
+					if(core.utils.is_object(events) && module) {
+						if(module_data[module]) {
+							module = module_data[module];
+							if(module.events) {
+								module.events = core.utils.retract(module.events, events);
+							}
+						} else {
+							core.log(2, "Events unsubscribed by non existant module: " + module);
+						}
+					} else {
+						core.log(2, "Invalid parameters sent to event unsubscription: events: " + events + "; module: " + module);
+					}
+				},
+				publish_global : function(event) {
+					core.events.publish(event);
+				},
+				subscribe_global : function(events, module) {
+					if(module_data[module]) {
+						core.events.subscribe(events, pagelet_selector, module);
+					} else {
+						core.log(2, "Events globally subscribed by non existant module: " + module);
+					}
+				},
+				unsubscribe_global : function(events, module) {
+					if(module_data[module]) {
+						core.events.unsubscribe(events, pagelet_selector, module);
+					} else {
+						core.log(2, "Events globally subscribed by non existant module: " + module);
+					}
+				},
 				// Pagelet Methods
 				load : function(url) {
 					var data = core.dom.data(CONTAINER), thiz = this;
 					if(url == null) {
 						url = this._get_url();
 					}
-					core.log(1, 'pagelet loading with url: ' + url)
+					core.log('pagelet loading with url: ' + url)
 					if(url != null) {
 						url = this._build_url(url);
-						core.log(1, 'loading url: ' + url);
+						core.log('loading url: ' + url);
 						if(url != null && url !== data.location) {
 							core.ajax.get(url, function(response) {
-								core.log(1, response);
+								core.log(response);
 								thiz.unregister_all();
 								if (response.css.length > 0) {
 									core.load_css(response.css);
@@ -130,7 +190,7 @@ define(['ampcms/sandbox'], function(sandbox) {
 				},
 				_load_html : function(html) {
 					core.dom.replace(CONTAINER, html);
-					CONTAINER = core.dom.find('#' + pagelet_selector);
+					CONTAINER = this.__CONTAINER = core.dom.find('#' + pagelet_selector);
 				},
 				_transform_links : function() {
 					var thiz = this, anchor, anchors, href, _i, _len;
@@ -149,162 +209,15 @@ define(['ampcms/sandbox'], function(sandbox) {
 						return false;
 					});
 				},
-				// Event Handling Methods
-				publish : function(event) {
-					for(module in module_data) {
-						if(module_data.hasOwnProperty(module)) {
-							module = module_data[module];
-							if(module.events && module.events[event.type]) {
-								module.events[event.type](event.data);
-							}
-						}
-					}
-				},
-				subscribe : function(events, module) {
-					if(core.utils.is_object(events) && module) {
-						if(module_data[module]) {
-							module = module_data[module]
-							if(module.events) {
-								module.events = core.utils.extend(module.events, events);
-							} else {
-								module.events = events;
-							}
-						} else {
-							core.log(2, "Events subscribed by non existant module: " + module);
-						}
-					} else {
-						core.log(2, "Invalid parameters sent to event subscription: events: " + events + "; module: " + module);
-					}
-				},
-				unsubscribe : function(events, module) {
-					if(core.utils.is_object(events) && module) {
-						if(module_data[module]) {
-							module = module_data[module]
-							if(module.events) {
-								module.events = core.utils.retract(module.events, events);
-							}
-						} else {
-							core.log(2, "Events unsubscribed by non existant module: " + module);
-						}
-					} else {
-						core.log(2, "Invalid parameters sent to event unsubscription: events: " + events + "; module: " + module);
-					}
-				},
-				publish_global : function(event) {
-					core.events.publish(event);
-				},
-				subscribe_global : function(events, module) {
-					if(module_data[module]) {
-						core.events.subscribe(events, pagelet_selector, module);
-					} else {
-						core.log(2, "Events globally subscribed by non existant module: " + module);
-					}
-				},
-				unsubscribe_global : function(events, module) {
-					if(module_data[module]) {
-						core.events.unsubscribe(events, pagelet_selector, module);
-					} else {
-						core.log(2, "Events globally subscribed by non existant module: " + module);
-					}
-				},
-				bind : function(element, type, fn) {
-					core.dom.bind(element, type, fn);
-				},
-				unbind : function(element, type, fn) {
-					core.dom.unbind(element, type, fn);
-				},
-	            live : function (element, type, fn) {
-	                core.dom.live(element, type, fn);           
-	            },
-	            die : function (element, type, fn) {
-	                core.dom.die(element, type, fn);              
-	            },
-				// Ajax Handling
-				post_form : function(form, callback) {
-					core.log(1, 'pagelet posting form: ' + form);
-					var thiz = this, form_action, page_data = core.dom.data(core.page);
-					// Set a default callback to replace the current pagelet with the new html
-					if (typeof callback === 'undefined') {
-						callback = function(response) {
-							core.log(1, response);
-							if (response.location == thiz._get_url()) {
-								thiz.unregister_all();
-								if(response.css) {
-									core.load_css(response.css);
-								}
-								if(response.js) {
-									core.load_js(response.js, function(new_pagelet) {
-										thiz._load_html(response.html);
-										thiz._transform_links();
-										new_pagelet.create(thiz);
-										thiz.start_all();
-									});
-								} else {
-									thiz._load_html(response.html);
-									thiz._transform_links();
-								}
-							} else {
-								thiz.push_url(response.location);
-							}
-						};
-					}
-					form_action = core.dom.attr(form, 'action');
-					if(!form_action) {
-						form_action = this._get_url();
-					}
-					form_action = this._build_url(form_action);
-					// } else {
-						// form_action = '/pagelet' + page_data.url + form_action;
-					// }
-					return core.ajax.post_form(form, form_action, callback);
-				},
-	            post : function(url, data, callback) {
-	            	core.ajax.post(url, data, callback);
-	            },
-	            get : function(url, data, callback) {
-	            	core.ajax.get(url, data, callback);
-	            },
-	            ajax : function(url, config) {
-	            	core.ajax.ajax(url, config);
-	            },
-				// Dom Handling
-				find : function(selector) {
-					return CONTAINER.find(selector);
-				},
-				filter : function(element, selector) {
-					return core.dom.filter(element, selector);
-				},
-				data : function(selector, key, data) {
-					return core.dom.data(selector, key, data);
-				},
-				remove_data : function(selector, key) {
-					core.dom.remove_data(selector, key);
-				},
-				add_class : function(selector, css) {
-					core.dom.add_class(selector, css);
-				},
-				remove_class : function(selector, css) {
-					core.dom.remove_class(selector, css);
-				},
-				has_class : function(selector, css) {
-					return core.dom.has_class(selector, css);
-				},
-				html : function(selector, html) {
-					core.dom.html(selector, html);
-				},
-				remove : function(selector) {
-					core.dom.remove(selector);
-				},
-				append : function(selector, child) {
-					core.dom.append(selector, child);
-				},
-				// Utilities
-				in_array: function(array, value) {
-					return core.utils.in_array(array, value);
+				// Other Functions
+				extend : function(target, source) {
+					return core.extend(target, source);
 				}
 			};
+			pagelet = core.extend(pagelet, this.extension.create(core, CONTAINER));
 			pagelet.load();
 			return pagelet;
-		}
+		},
+		extension : {}
 	};
 });
