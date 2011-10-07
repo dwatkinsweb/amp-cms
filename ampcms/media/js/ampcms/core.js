@@ -101,14 +101,16 @@ define(['require', 'ampcms/pagelet', 'ampcms/sandbox', 'libs/history'], function
 					var title = id+' : '+url;
 					var data = {};
 					data[id] = url;
-					HistoryPlugin.pushState(data, title, new_url);
+					// TODO: Currently not implementing title changes.
+					HistoryPlugin.pushState(data, null, new_url);
 				},
 				replace_state : function(id, url) {
 					var new_url = '?'+id+'='+url;
 					var title = id+' : '+url;
 					var data = {};
 					data[id] = url;
-					HistoryPlugin.replaceState(data, title, new_url);
+					// TODO: Currently not implementing title changes.
+					HistoryPlugin.replaceState(data, null, new_url);
 				},
 				get_state : function(id) {
 					var state = HistoryPlugin.getState();
