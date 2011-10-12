@@ -56,6 +56,18 @@ define(['require', 'ampcms/pagelet', 'ampcms/sandbox', 'libs/history'], function
 				this.log('loading js: ' + js);
 				require(js, callback);
 			},
+			load_page : function(module, page, pagelets) {
+				var _key, pagelet_data = [];
+				for (_key in pagelets) {
+					if (pagelets.hasOwnProperty(_key)) {
+						pagelet_data.push(_key+'-pagelet='+pagelets[_key]);
+					}
+				}
+				this.redirect('/'+module+'/'+page+'?'+pagelet_data.join('&'));
+			},
+			redirect : function(url) {
+				location.href = url;
+			},
 			// Event Handling Methods
 			events : {
 				publish : function(event) {

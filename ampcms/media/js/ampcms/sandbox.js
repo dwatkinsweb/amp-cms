@@ -29,6 +29,12 @@ define(function() {
 				},
 				unsubscribe_global : function(events) {
 					pagelet.unsubscribe_global(events, module_selector);
+				},
+				load_page : function(module, page, pagelets) {
+					pagelet.load_page(module, page, pagelets);
+				},
+				redirect : function(url) {
+					pagelet.redirect(url);
 				}
 			};
 			sandbox = pagelet.extend(sandbox, this.extension.create(pagelet, CONTAINER));

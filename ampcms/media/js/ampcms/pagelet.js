@@ -134,6 +134,12 @@ define(['ampcms/sandbox'], function(sandbox) {
 						core.log(2, "Events globally subscribed by non existant module: " + module);
 					}
 				},
+				load_page : function(module, page, pagelets) {
+					core.load_page(module, page, pagelets);
+				},
+				redirect : function(url) {
+					core.redirect(url);
+				},
 				// Pagelet Methods
 				load : function(url) {
 					var data = core.dom.data(CONTAINER), thiz = this;
