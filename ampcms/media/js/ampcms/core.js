@@ -136,7 +136,7 @@ define(['require', 'ampcms/pagelet', 'ampcms/sandbox', 'libs/history'], function
 					HistoryPlugin.replaceState(data, null, new_url);
 				},
 				get_state : function(id) {
-					var state = HistoryPlugin.getState(), data = state.data, query_string;
+					var state = History.getState(), data = state.data, query_string;
 					if (core.utils.is_empty_object(data)) {
 						query_string = window.location.search;
 						if (query_string === "") {
@@ -148,7 +148,11 @@ define(['require', 'ampcms/pagelet', 'ampcms/sandbox', 'libs/history'], function
 						if (query_string.length > 1) {
 							data = core.parse_query_string(query_string);
 						}
-						HistoryPlugin.pushState(data, null, query_string);
+						History.pushState(data, null, query_string);
+						if (!window.history || !window.history.pushState) {
+							window.location.search = '';
+						}
+						state = History.getState();
 					}
 					if (typeof id !== 'undefined') {
 						state = state.data[id];
