@@ -1,13 +1,13 @@
 from genshi.core import Markup
 from django_genshi.shortcuts import render_to_stream
-from django.http import HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect
 from django.conf import settings
 from django.core.urlresolvers import resolve
 
 from ampcms.lib.content_type import BaseContentType
 from ampcms.lib.content_type_mapper import ContentTypeMapper
 from ampcms.lib.application_mapper import application_mapper
-from ampcms.lib.response import AMPCMSAjaxResponse, AMPCMSMedia
+from ampcms.lib.response import AMPCMSAjaxResponse
 from ampcms import const as C
 
 import json
@@ -161,6 +161,8 @@ class ApplicationPagelet(BasePagelet):
         application_content = self._build_content()
         if isinstance(application_content, AMPCMSAjaxResponse):
             return application_content.response
+        elif isinstance(application_content, HttpResponseRedirect):
+            return application_content
         else:
             html = self.html(include_content=application_content)
             return json.dumps({C.JSON_KEY_NAME: self._data_model.name,
@@ -188,13 +190,14 @@ class ApplicationPagelet(BasePagelet):
             view, args, kwargs = resolve(self.process_url, application.urlconf)
             self.request.is_ampcms = True
             response = view(self.request, *args, **kwargs)
-            if isinstance(response, HttpResponseRedirect):
-                # If it's a redirect, build the content based on new url
-                # TODO: I don't like the way this is removing the prefix out of the url but couldn't think of anything better atm.
-                self.process_url = response['location'].replace('/%s' % application.url_prefix, '', 1)
-                return self._build_content()
-            elif isinstance(response, AMPCMSAjaxResponse):
+            if isinstance(response, AMPCMSAjaxResponse):
                 # If it's an AMPCMSAjaxResponse, return as is
+                return response
+            elif isinstance(response, HttpResponseRedirect):
+                # If it's a redirect, build the content based on new url
+                log.debug('Redirecting to %s' % response['location'])
+                # TODO: I don't like the way this is removing the prefix out of the url but couldn't think of anything better atm.
+                response['location'] = '%s%s' % (self._data_model.get_absolute_url(), response['location'].replace('/%s' % application.url_prefix, '', 1))
                 return response
             if hasattr(response, 'ampcms_media'):
                 self.view_css = response.ampcms_media.css

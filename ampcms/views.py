@@ -68,7 +68,11 @@ def pagelet(request, *args, **kwargs):
         process_url = '/'+kwargs['url']
     else:
         process_url = '/'
-    response = HttpResponse(pagelet_object.json(process_url))
+    pagelet_json = pagelet_object.json(process_url)
+    if isinstance(pagelet_json, HttpResponse):
+        response = pagelet_json
+    else: 
+        response = HttpResponse(pagelet_json)
     # TODO: Come up with a better way to ignore cache for IE
     if 'MSIE' in request.META['HTTP_USER_AGENT']:
         response['Cache-Control'] = 'max-age=0,no-cache,no-store,post-check=0,pre-check=0'
