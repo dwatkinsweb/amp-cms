@@ -141,38 +141,46 @@ define(['ampcms/sandbox'], function(sandbox) {
 					core.redirect(url);
 				},
 				// Pagelet Methods
+				load_response : function(response) {
+					var thiz = this
+					core.log(response);
+					this.unregister_all();
+					if (response.css.length > 0) {
+						core.load_css(response.css);
+					}
+					if (response.js.length > 0) {
+						core.load_js(response.js, function(new_pagelet) {
+							thiz._load_html(response.html);
+							thiz._transform_links();
+							new_pagelet.create(thiz);
+							thiz.start_all();
+							thiz.push_state(response.location);
+						});
+					} else {
+						this._load_html(response.html);
+						this._transform_links();
+						thiz.push_state(response.location);
+					}
+				},
 				load : function(url) {
-					var data = core.dom.data(CONTAINER), thiz = this;
+					var data, thiz = this, new_url;
 					if(url == null) {
 						url = this._get_url();
 					}
 					core.log('pagelet loading with url: ' + url)
 					if(url != null) {
-						url = this._build_url(url);
 						core.log('loading url: ' + url);
-						if(url != null && url !== data.location) {
-							core.ajax.get(url, function(response) {
-								core.log(response);
-								thiz.unregister_all();
-								if (response.css.length > 0) {
-									core.load_css(response.css);
-								}
-								if (response.js.length > 0) {
-									core.load_js(response.js, function(new_pagelet) {
-										thiz._load_html(response.html);
-										thiz._transform_links();
-										new_pagelet.create(thiz);
-										thiz.start_all();
-									});
-								} else {
-									thiz._load_html(response.html);
-									thiz._transform_links();
-								}
+						new_url = this._build_url(url);
+						data = core.dom.data(CONTAINER);
+						if(new_url != null && url !== data.location) {
+							core.ajax.get(new_url, function(response) {
+								thiz.load_response(response);
 							});
 						}
 					}
 				},
 				push_state : function(url) {
+					core.log('Pushing state : '+pagelet_selector+'-'+url);
 					return core.history.push_state(pagelet_selector, url);
 				},
 				replace_state : function(url) {

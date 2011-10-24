@@ -237,7 +237,6 @@ define(['require', 'ampcms/pagelet', 'ampcms/sandbox', 'libs/history'], function
 						pagelet.load(pagelet_state);
 					}
 				});
-				//HistoryPlugin.Adapter.trigger('statechange');
 			},
 			config : function(ampcms_config) {
 				this.log('loading configurations');

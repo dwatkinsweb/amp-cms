@@ -9,7 +9,7 @@ define(function() {
 					pagelet.log(severity, message);
 				},
 				push_url : function(url) {
-					pagelet.push_url(url);
+					pagelet.load(url);
 				},
 				// Event Handling
 				publish : function(event) {
@@ -29,6 +29,10 @@ define(function() {
 				},
 				unsubscribe_global : function(events) {
 					pagelet.unsubscribe_global(events, module_selector);
+				},
+				// Url Handling
+				build_url : function(url) {
+					return pagelet._build_url(url);
 				},
 				load_page : function(module, page, pagelets) {
 					pagelet.load_page(module, page, pagelets);
