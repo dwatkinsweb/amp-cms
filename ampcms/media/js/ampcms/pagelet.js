@@ -149,10 +149,16 @@ define(['ampcms/sandbox'], function(sandbox) {
 						core.load_css(response.css);
 					}
 					if (response.js.length > 0) {
-						core.load_js(response.js, function(new_pagelet) {
+						core.load_js(response.js, function() {
+							var _i, _len, new_pagelet;
 							thiz._load_html(response.html);
 							thiz._transform_links();
-							new_pagelet.create(thiz);
+							for (_i = 0, _len = arguments.length; _i < _len; _i++) {
+								new_pagelet = arguments[_i];
+								if (new_pagelet != null && typeof new_pagelet === 'object' && new_pagelet.hasOwnProperty('create')) {
+									new_pagelet.create(thiz);
+								}
+							}
 							thiz.start_all();
 							thiz.push_state(response.location);
 						});
