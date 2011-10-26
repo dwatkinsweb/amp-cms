@@ -224,15 +224,19 @@ define(['ampcms/sandbox'], function(sandbox) {
 					CONTAINER = this.__CONTAINER = core.dom.find('#' + pagelet_selector);
 				},
 				_transform_links : function() {
-					var thiz = this, anchor, anchors, href, _i, _len;
+					var thiz = this, anchor, anchors, transformed_anchors, href, _i, _len;
 					anchors = CONTAINER.find('a[target!=_blank]');
+					transformed_anchors = [];
 					for( _i = 0, _len = anchors.length; _i < _len; _i++) {
 						anchor = anchors[_i];
 						href = core.dom.attr(anchor, 'href');
-						href = href.replace(/^.*\.com/, '');
-						core.dom.attr(anchor, 'href', '#' + href);
+						if (typeof href !== 'undefined') {
+							href = href.replace(/^.*\.com/, '');
+							core.dom.attr(anchor, 'href', '#' + href);
+							transformed_anchors.push(anchor)
+						}
 					}
-					core.dom.bind(anchors, 'click', function(event) {
+					core.dom.bind(transformed_anchors, 'click', function(event) {
 						var target, url;
 						target = core.dom.find(event.target);
 						url = core.dom.attr(target, 'href').split('#')[1];
