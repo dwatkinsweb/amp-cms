@@ -160,12 +160,12 @@ define(['ampcms/sandbox'], function(sandbox) {
 								}
 							}
 							thiz.start_all();
-							thiz.push_state(response.location);
+							thiz.replace_state(response.location);
 						});
 					} else {
 						this._load_html(response.html);
 						this._transform_links();
-						thiz.push_state(response.location);
+						thiz.replace_state(response.location);
 					}
 				},
 				load : function(url) {
