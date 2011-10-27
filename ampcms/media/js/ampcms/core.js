@@ -19,6 +19,9 @@ define(['require', 'ampcms/pagelet', 'ampcms/sandbox', 'libs/history'], function
 	}
 	if(core === null) {
 		core = {
+			supports : {
+				history: (window.history && window.history.pushState)
+			},
 			log : function(severity, message) {
 				if (typeof message === 'undefined') {
 					message = severity;
@@ -58,12 +61,17 @@ define(['require', 'ampcms/pagelet', 'ampcms/sandbox', 'libs/history'], function
 			},
 			load_page : function(module, page, pagelets) {
 				var _key, pagelet_data = [];
+				// TODO: Change this to use core.build_query_string
 				for (_key in pagelets) {
 					if (pagelets.hasOwnProperty(_key)) {
 						pagelet_data.push(_key+'-pagelet='+pagelets[_key]);
 					}
 				}
-				this.redirect('/'+module+'/'+page+'?'+pagelet_data.join('&'));
+				query_string = '?'+pagelet_data.join('&');
+				if (!core.supports.history) {
+					query_string = '#'+query_string;
+				}
+				this.redirect('/'+module+'/'+page+query_string);
 			},
 			redirect : function(url) {
 				location.href = url;
@@ -145,18 +153,18 @@ define(['require', 'ampcms/pagelet', 'ampcms/sandbox', 'libs/history'], function
 								query_string = query_string.substring(1);
 							}
 						}
+						if (query_string.indexOf('?')) {
+							query_string = query_string.substring(query_string.indexOf('?'));
+						}
+						core.log('query_string: '+query_string);
 						if (query_string.length > 1) {
 							data = core.parse_query_string(query_string);
 						}
-						History.pushState(data, null, query_string);
-						if ((!window.history || !window.history.pushState) && window.location.search !== "") {
-							window.location.search = '';
-						}
-						state = History.getState();
 					}
 					if (typeof id !== 'undefined') {
 						state = data[id];
 					}
+					core.log('Returning state: '+state);
 					return state;
 				},
 				back : function() {
