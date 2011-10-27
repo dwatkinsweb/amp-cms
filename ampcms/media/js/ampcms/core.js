@@ -137,7 +137,7 @@ define(['require', 'ampcms/pagelet', 'ampcms/sandbox', 'libs/history'], function
 				},
 				get_state : function(id) {
 					var state = History.getState(), data = state.data, query_string;
-					if (core.utils.is_empty_object(data)) {
+					if (core.utils.is_empty_object(state.data)) {
 						query_string = window.location.search;
 						if (query_string === "") {
 							query_string = window.location.hash;
@@ -149,13 +149,13 @@ define(['require', 'ampcms/pagelet', 'ampcms/sandbox', 'libs/history'], function
 							data = core.parse_query_string(query_string);
 						}
 						History.pushState(data, null, query_string);
-						if (!window.history || !window.history.pushState) {
+						if ((!window.history || !window.history.pushState) && window.location.search !== "") {
 							window.location.search = '';
 						}
 						state = History.getState();
 					}
 					if (typeof id !== 'undefined') {
-						state = state.data[id];
+						state = data[id];
 					}
 					return state;
 				},
@@ -244,7 +244,6 @@ define(['require', 'ampcms/pagelet', 'ampcms/sandbox', 'libs/history'], function
 				if (typeof ampcms_config.config !== 'undefined') {
 					config = this.extend(config, ampcms_config.config);
 				}
-				
 				if (typeof ampcms_config.extensions.core !== 'undefined') {
 					extensions[i] = ampcms_config.extensions.core;
 					extension_targets[i] = this;

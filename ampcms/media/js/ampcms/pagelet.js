@@ -174,7 +174,7 @@ define(['ampcms/sandbox'], function(sandbox) {
 						url = this._get_url();
 					}
 					core.log('pagelet loading with url: ' + url)
-					if(url != null) {
+					if(url != null && typeof url !== 'undefined') {
 						core.log('loading url: ' + url);
 						new_url = this._build_url(url);
 						data = core.dom.data(CONTAINER);
