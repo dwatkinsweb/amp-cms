@@ -33,7 +33,7 @@ class BaseLayout(BaseContentType):
         '''
         super(BaseLayout, self).__init__(*args, **kwargs)
         self._page = page
-        self._template = 'ampcms/layout.html'
+        self._template = 'layout.html'
 
     def _build_children(self):
         '''

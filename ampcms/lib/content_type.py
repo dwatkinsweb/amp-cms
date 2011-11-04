@@ -21,6 +21,9 @@ from genshi.core import Markup
 
 from ampcms import const as C
 from django.core.exceptions import ImproperlyConfigured
+from django.conf import settings
+
+import os
 
 class BaseContentType(object):
     '''
@@ -57,10 +60,19 @@ class BaseContentType(object):
         TODO: Turn this into a concatenation of the files 
         '''
         if self._css is None:
+            site = self.request_kwargs['site_model']
             css_list = self._build_css()
             css_list_unique = []
             [css_list_unique.append(css) for css in css_list if (css and not css_list_unique.count(css))]
-            self._css = '\n'.join(['@import url("%s");' % _css for _css in css_list_unique])
+            self._css = []
+            for _css in css_list_unique:
+                if settings.MEDIA_URL in _css:
+                    self._css.append('@import url("%s");' % _css)
+                elif site.skin is not None and os.path.exists('%scss/%s/%s' % (settings.MEDIA_ROOT, site.skin, _css)):
+                    self._css.append('@import url("%scss/%s/%s");' % (settings.MEDIA_URL, site.skin, _css))
+                else:
+                    self._css.append('@import url("%scss/%s");' % (settings.MEDIA_URL, _css))
+            self._css = '\n'.join(self._css)
         return self._css
     
     def _build_css(self):
@@ -93,9 +105,13 @@ class BaseContentType(object):
         '''
         Return the template needed for the object
         '''
+        site = self.request_kwargs['site_model']
         if self._template is None:
             raise ImproperlyConfigured('No template defined for object %s' % type(self))
-        return self._template
+        template_list = ['ampcms/%s' % self._template]
+        if site.skin is not None:
+            template_list.insert(0, 'ampcms/%s/%s' % (site.skin, self._template))
+        return template_list
     
     def _get_context(self):
         '''
