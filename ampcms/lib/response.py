@@ -30,13 +30,15 @@ class AMPCMSMedia(object):
         self.js = js
     
     @property
-    def _get_css(self):
+    def css(self):
         css_files = []
         for css in self._css:
             if settings.MEDIA_URL in css:
-                css_files.append(css)
-            elif self.site.skin is not None and os.path.exists('%s/css/%s/%s' % (settings.MEDIA_ROOT, self.site.skin, css)):
-                css_files.append('%s/css/%s/%s' % (settings.MEDIA_URL, self.site.skin, css))
+                pass
+            elif self.site.skin is not None and os.path.exists('%scss/%s/%s' % (settings.MEDIA_ROOT, self.site.skin, css)):
+                css = '%scss/%s/%s' % (settings.MEDIA_URL, self.site.skin, css)
             else:
-                css_files.append('%s/css/%s' % (settings.MEDIA_URL, css))
+                css = '%scss/%s' % (settings.MEDIA_URL, css)
+            css_files.append(css)
         return css_files
+    
