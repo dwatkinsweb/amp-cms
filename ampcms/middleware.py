@@ -17,6 +17,7 @@
 
 from django.http import Http404
 from ampcms.models import User, Group
+from ampcms.utils import set_current_request
 
 import logging
 log = logging.getLogger(__name__)
@@ -32,3 +33,7 @@ class UserManagement:
                 raise Http404
             # TODO: Find a way to replace this with an actual manager instead of a queryset
             request.user.groups = Group.objects.filter(pk__in=[group.id for group in request.user.groups.all()])
+
+class RequestThreadStorage:
+    def process_request(self, request):
+        set_current_request(request)
