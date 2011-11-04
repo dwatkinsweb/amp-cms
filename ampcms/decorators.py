@@ -90,7 +90,8 @@ def ampcms_view(template=None, css_files=[], js_files=[]):
                 if template is not None:
                     kwargs['template'] = template
                 response = view_func(request, *args, **kwargs)
-                response.ampcms_media = AMPCMSMedia(css_files, js_files)
+                site = Site.objects.get_by_request(request)
+                response.ampcms_media = AMPCMSMedia(site, css_files, js_files)
                 return response
         return wraps(view_func)(wrapped_view)
     return decorator

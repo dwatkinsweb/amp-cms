@@ -15,11 +15,28 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
 
+from django.conf import settings
+
+import os
+
 class AMPCMSAjaxResponse(object):
     def __init__(self, response):
         self.response = response
 
 class AMPCMSMedia(object):
-    def __init__(self, css_files, js_files):
-        self.css = css_files
-        self.js = js_files
+    def __init__(self, site, css, js):
+        self.site = site
+        self._css = css
+        self.js = js
+    
+    @property
+    def _get_css(self):
+        css_files = []
+        for css in self._css:
+            if settings.MEDIA_URL in css:
+                css_files.append(css)
+            elif self.site.skin is not None and os.path.exists('%s/css/%s/%s' % (settings.MEDIA_ROOT, self.site.skin, css)):
+                css_files.append('%s/css/%s/%s' % (settings.MEDIA_URL, self.site.skin, css))
+            else:
+                css_files.append('%s/css/%s' % (settings.MEDIA_URL, css))
+        return css_files
