@@ -33,7 +33,7 @@ class AMPCMSMedia(object):
     def css(self):
         css_files = []
         for css in self._css:
-            if settings.MEDIA_URL in css:
+            if 'HTTP://' in css or settings.MEDIA_URL in css:
                 pass
             elif self.site.skin is not None and os.path.exists('%scss/%s/%s' % (settings.MEDIA_ROOT, self.site.skin, css)):
                 css = '%scss/%s/%s' % (settings.MEDIA_URL, self.site.skin, css)
