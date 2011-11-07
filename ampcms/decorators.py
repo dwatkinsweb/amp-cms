@@ -59,7 +59,7 @@ def user_passes_test(function, login_url=settings.AMPCMS_LOGIN_URL, public_url=s
                 'module_model': module,
                 'page_model': page
             })
-            if request.user.has_acl(module, page):
+            if not site.private or request.user.has_acl(module, page):
                 return view_func(request, *args, **kwargs)
             else:
                 log.warning('User ACL rejected for %s viewing %s.%s' % (request.user, module.name, page.name))

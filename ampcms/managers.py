@@ -27,12 +27,18 @@ log = logging.getLogger(__name__)
 class ModuleManager(Manager):
     use_for_related_fields = True
     
+    def active(self):
+        active_pagelets = self.get_query_set().filter(active=True)
+        if settings.AMPCMS_CACHING:
+            active_pagelets.cache(timeout=settings.AMPCMS_CACHING_TIMEOUT)
+        return active_pagelets
+    
     def active_site_modules(self, site):
         '''
         Get active modules for a given site.
         @param site: AmpCms Site Model instance
         '''
-        modules = self.get_query_set().filter(site=site, active=True)
+        modules = self.active().filter(site=site)
         if settings.AMPCMS_CACHING:
             modules.cache(timeout=settings.AMPCMS_CACHING_TIMEOUT)
         return modules
@@ -53,8 +59,14 @@ class ModuleManager(Manager):
 class PageManager(Manager):
     use_for_related_fields = True
     
-    def active_site_pages(self, site):
-        pages = self.get_query_set().filter(module__site=site, active=True)
+    def active(self):
+        active_pagelets = self.get_query_set().filter(active=True)
+        if settings.AMPCMS_CACHING:
+            active_pagelets.cache(timeout=settings.AMPCMS_CACHING_TIMEOUT)
+        return active_pagelets
+    
+    def active_site_pages(self, site, module=None):
+        pages = self.active().filter(module__site=site)
         if settings.AMPCMS_CACHING:
             pages.cache(timeout=settings.AMPCMS_CACHING_TIMEOUT)
         return pages
