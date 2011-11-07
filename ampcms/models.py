@@ -34,6 +34,7 @@ application_mapper.autodiscover()
 class Site(DjangoSite):
     private = models.BooleanField()
     skin = models.CharField(max_length=20, null=True, blank=True)
+    database_name = models.CharField(max_length=20, null=True, blank=True)
 
     objects = managers.SiteManager()
 

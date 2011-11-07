@@ -26,7 +26,8 @@ from ampcms.models import Module, Page, Pagelet, PageletAttribute, User, Group, 
 from ampcms.conf import settings
 
 class SiteAdmin(DjangoSiteAdmin):
-    list_display = ('domain', 'name', 'private')
+    list_display = ('domain', 'name', 'skin', 'database_name', 'private')
+    list_filter = ('private',)
 
 class UserChangeForm(DjangoUserChangeForm):
     class Meta:
