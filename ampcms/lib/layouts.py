@@ -50,25 +50,29 @@ class BaseLayout(BaseContentType):
         '''
         Build the main and sub menus for the application based on modules and pages
         '''
-        menus = {}
-        # Build main menu
-        menus[MenuTypes.MAIN] = MenuPagelet(menu_label=MenuTypes.MAIN, selected_item=self._page._data_model.module.title,
-                                            request=self.request, request_kwargs=self.request_kwargs)
-        if self.request.user.is_anonymous:
-            for module in Module.objects.active_site_modules(self._page._data_model.module.site):
+        current_page = self._page._data_model
+        current_module = current_page.module
+        site = current_module.site
+        menus = {
+            MenuTypes.MAIN : MenuPagelet(label=MenuTypes.MAIN,
+                                         selected_item=current_module.title,
+                                         request=self.request,
+                                         request_kwargs=self.request_kwargs),
+            MenuTypes.SIDE : MenuPagelet(label=MenuTypes.SIDE,
+                                         selected_item=current_page.title,
+                                         request=self.request,
+                                         request_kwargs=self.request_kwargs)}
+        
+        if self.request.user.is_anonymous():
+            for module in Module.objects.active_site_modules(site):
                 menus[MenuTypes.MAIN].append(module.title, '/%s' % module.name)
+            for page in Page.objects.active_module_pages(current_module):
+                menus[MenuTypes.SIDE].append(page.title, '/%s/%s' % (current_module.name, page.name))
         else:
-            for module in Module.objects.active_user_site_modules(self.request.user, self._page._data_model.module.site):
+            for module in Module.objects.active_user_site_modules(self.request.user, site):
                 menus[MenuTypes.MAIN].append(module.title, '/%s' % module.name)
-        # Build side menu
-        menus[MenuTypes.SIDE] = MenuPagelet(MenuTypes.SIDE, self._page._data_model.title,
-                                            request=self.request, request_kwargs=self.request_kwargs)
-        if self.request.user.is_anonymous:
-            for page in Page.objects.active_site_pages(self._page._data_model.module.site, module=self._page._data_model.module):
-                menus[MenuTypes.SIDE].append(page.title, '/%s/%s' % (page.module.name, page.name))
-        else:
-            for page in Page.objects.active_user_site_pages(self.request.user, self._page._data_model.module.site, module=self._page._data_model.module):
-                menus[MenuTypes.SIDE].append(page.title, '/%s/%s' % (page.module.name, page.name))
+            for page in Page.objects.active_user_module_pages(self.request.user, current_module):
+                menus[MenuTypes.SIDE].append(page.title, '/%s/%s' % (current_module.name, page.name))
         return menus
 
 class PCLayout(BaseLayout):

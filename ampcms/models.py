@@ -143,7 +143,7 @@ class User(DjangoUser):
         return self.has_perm('%s.%s' % (module.name, page.name))
 
 if settings.AMPCMS_CACHING:
-    from caching.base import CachingMixin
+    from caching.base import CachingMixin #@UnresolvedImport
     Site.__bases__ += (CachingMixin,)
     Module.__bases__ += (CachingMixin,)
     Page.__bases__ += (CachingMixin,)
@@ -151,33 +151,33 @@ if settings.AMPCMS_CACHING:
     PageletAttribute.__bases__ += (CachingMixin,)
     User.__bases__ += (CachingMixin,)
     
-def get_module_and_page(site, module_name, page_name):
+def get_public_module_and_page(site, module_name, page_name):
     ''' Get the module and the page based on request/url '''
     if site.private:
         # Private sites should never use this function, raise exception and die as a safety measure
-        msg = 'Private site was somehow used publicly. (%s/%s/%s)' % (site, module_name, page_name)
-        log.critical(msg)
-        raise Exception(msg)
+        message = 'Private site was somehow used publicly. (%s/%s/%s)' % (site, module_name, page_name)
+        log.critical(message)
+        raise Exception(message)
     
     try:
         if module_name is None:
             try:
-                page = Page.objects.active_site_pages(site)[0]
+                page = Page.objects.filter(module__site=site)[0]
             except IndexError, e:
-                msg = 'Site %s has no pages' % site
-                log.warning(msg)
-                raise PageDoesNotExist(msg)
+                message = 'Site %s has no pages' % site
+                log.warning(message)
+                raise PageDoesNotExist(message)
             else:
                 module = page.module
         else:
             module = Module.objects.active().get(name=module_name, site=site)
             if page_name is None:
                 try:
-                    page = Page.objects.active(site, module)[0]
+                    page = Page.objects.active_module_pages(module)[0]
                 except IndexError, e:
-                    msg = 'Unable to find default page for module %s on site %s' % (site, module.name)
-                    log.info(msg)
-                    raise PageDoesNotExist(msg)
+                    message = 'Unable to find default page for module %s on site %s' % (site, module.name)
+                    log.warning(message)
+                    raise PageDoesNotExist(message)
             else:
                 page = module.active_pages.get(name=page_name)
     except Module.DoesNotExist, e:
@@ -189,27 +189,27 @@ def get_module_and_page(site, module_name, page_name):
     
     return (module, page)
     
-def get_user_module_and_page(user, site, module_name, page_name):
+def get_private_module_and_page(site, module_name, page_name, user):
     ''' Get the module and the page based on request/url '''
     try:
         if module_name is None:
             try:
-                page = Page.objects.active_user_site_pages(user, site)[0]
+                page = Page.objects.active_user_pages(user).filter(module__site=site)[0]
             except IndexError, e:
-                log.info('Unable to get default page and module for user %s' % user)
-                raise PageDoesNotExist('Unable to get default page and module for user %s' % user)
+                message = 'Unable to get default page and module for user %s' % user
+                log.warning(message)
+                raise PageDoesNotExist(message)
             else:
                 module = page.module
         else:
-            module = Module.objects.active_site_modules(site).get(name=module_name)
+            module = Module.objects.active_user_site_modules(user, site).get(name=module_name)
             if page_name is None:
                 try:
-                    page = Page.objects.active_user_site_pages(user, site, module)[0]
+                    page = Page.objects.active_user_module_pages(user, module)[0]
                 except IndexError, e:
-                    log.info('Unable to get default page in module %s for user %s' 
-                              % (module.name, user))
-                    raise PageDoesNotExist('Unable to get default page in module %s for user %s' 
-                                           % (module.name, user))
+                    message = 'Unable to get default page in module %s for user %s' % (module.name, user)
+                    log.warning(message)
+                    raise PageDoesNotExist(message)
             else:
                 page = module.active_pages.get(name=page_name)
     except Module.DoesNotExist, e:

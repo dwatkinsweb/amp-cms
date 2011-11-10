@@ -15,10 +15,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
 
-from genshi.core import Markup
-from django_genshi.shortcuts import render_to_stream
-from django.http import HttpResponse, HttpResponseRedirect
-from django.conf import settings
+from genshi.core import Markup #@UnresolvedImport
+from django_genshi.shortcuts import render_to_stream #@UnresolvedImport
+from django.http import HttpResponseRedirect
 from django.core.urlresolvers import resolve
 
 from ampcms.lib.content_type import BaseContentType
@@ -86,7 +85,7 @@ class MenuPagelet(BasePagelet):
     '''
     Pagelet used to build a menu. This is not a pagelet that 
     '''
-    def __init__(self, menu_label=None, selected_item=None, template='pagelets/menu.html', pagelet=None, **kwargs):
+    def __init__(self, label=None, selected_item=None, template='pagelets/menu.html', **kwargs):
         '''
         Initialize the menu. Default this pagelet to None because the pagelet may not be created from the database.
         @param menu_label: label of the menu used as the <ul> class and id
@@ -94,7 +93,7 @@ class MenuPagelet(BasePagelet):
         @param template: list of menu children. Each item needs to be in a tuple(label, href) format
         '''
         super(MenuPagelet, self).__init__(**kwargs)
-        self.menu_label = menu_label
+        self.label = label
         self.selected_item = selected_item
         self._template = template
         self._children = []
@@ -109,19 +108,19 @@ class MenuPagelet(BasePagelet):
     
     def _get_context(self):
         context = super(MenuPagelet, self)._get_context()
-        context.update({C.CONTENT_TYPE_CONTEXT_MENU_LABEL: self.menu_label,
+        context.update({C.CONTENT_TYPE_CONTEXT_MENU_LABEL: self.label,
                         C.CONTENT_TYPE_CONTEXT_SELECTED_ITEM : self.selected_item})
         return context
     
     def _get_html_data(self):
-        data = {C.HTML_DATA_TAG_KEY_NAME : self.menu_label}
+        data = {C.HTML_DATA_TAG_KEY_NAME : self.label}
         return data
     
     def _build_css(self):
         '''
         Return the css based on the menu_label
         '''
-        return ['%s.css' % self.menu_label]
+        return ['%s.css' % self.label]
 
 class SimplePagelet(BasePagelet):
     '''

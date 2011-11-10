@@ -15,9 +15,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
 
-from django_genshi.shortcuts import render_to_stream
-from django_genshi import RequestContext
-from genshi.core import Markup
+from django_genshi.shortcuts import render_to_stream #@UnresolvedImport
+from django_genshi import RequestContext #@UnresolvedImport
+from genshi.core import Markup #@UnresolvedImport
 
 from ampcms import const as C
 from django.core.exceptions import ImproperlyConfigured

@@ -15,14 +15,15 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
 
-from ampcms.models import Site, get_module_and_page, get_user_module_and_page
+from ampcms.models import Site, get_public_module_and_page, get_private_module_and_page
 from ampcms.lib.exceptions import PageDoesNotExist
 from ampcms.lib.response import AMPCMSAjaxResponse, AMPCMSMedia
-from ampcms.conf import settings
+from ampcms import const as C
 from django.utils.functional import wraps
 from django.utils.decorators import available_attrs
 from django.utils.http import urlquote
 from django.http import HttpResponseRedirect
+from django.conf import settings
 
 import logging
 log = logging.getLogger(__name__)
@@ -31,11 +32,12 @@ def user_passes_test(function, login_url=settings.AMPCMS_LOGIN_URL, public_url=s
     def _decorator(view_func):
         def _wrapped_view(request, *args, **kwargs):
             site = Site.objects.get_by_request(request)
+            module_name = kwargs.get(C.URL_KEY_MODULE)
+            page_name = kwargs.get(C.URL_KEY_PAGE)
             if not site.private:
-                # Attempt to load module and page
                 try:
-                    module, page = get_module_and_page(site, kwargs.get('module'), kwargs.get('page'))
-                except (PageDoesNotExist):
+                    module, page = get_public_module_and_page(site, module_name, page_name)
+                except:
                     # Redirect to the public home page
                     return HttpResponseRedirect(public_url)
                 else:
@@ -44,20 +46,19 @@ def user_passes_test(function, login_url=settings.AMPCMS_LOGIN_URL, public_url=s
             elif request.user.is_authenticated():
                 # Attempt to load module and page
                 try:
-                    module, page = get_user_module_and_page(request.user, site, kwargs.get('module'), kwargs.get('page'))
+                    module, page = get_private_module_and_page(site, module_name, page_name, request.user)
                 except (PageDoesNotExist):
                     return HttpResponseRedirect(permission_denied_url)
                 else:
                     log.info('Successfully loaded module and page: User %s viewing page %s.%s' 
                               % (request.user.username, module.name, page.name))
             else:
-                # TODO: Find a way to be able to redirect with the hash tag still available. Will require javascript.
                 return HttpResponseRedirect('%s?next=%s' % (login_url, urlquote(request.get_full_path())))
             
             kwargs.update({
-                'site_model': site,
-                'module_model': module,
-                'page_model': page
+                C.EXTRA_KWARGS_SITE : site,
+                C.EXTRA_KWARGS_MODULE : module,
+                C.EXTRA_KWARGS_PAGE : page
             })
             if not site.private or request.user.has_acl(module, page):
                 return view_func(request, *args, **kwargs)

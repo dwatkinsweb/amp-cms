@@ -17,11 +17,12 @@
 
 from ampcms.lib import layouts, pages
 from ampcms.decorators import acl_required
-from ampcms.conf import settings
+from ampcms import const as C
 from django.core.urlresolvers import resolve
 from django.http import HttpResponse, HttpResponseRedirect
-from django_genshi import RequestContext, render_to_response
-from genshi.core import Markup
+from django.conf import settings
+from django_genshi import RequestContext, render_to_response #@UnresolvedImport
+from genshi.core import Markup #@UnresolvedImport
 
 import logging
 log = logging.getLogger(__name__)
@@ -49,43 +50,47 @@ def logout(request, *args, **kwargs):
 @acl_required()
 def index(request, *args, **kwargs):
     log.debug('ampcms.views.index - start')
-    page = kwargs.pop('page_model')
-    page_object = pages.page_mapper.get_item(page.page_class)(request=request, request_kwargs=kwargs, page=page)
-    # TODO: need to get the layout based on meta[user_agent]
-    layout = layouts.PCLayout(request=request, request_kwargs=kwargs, page=page_object)
+    page = kwargs.pop(C.EXTRA_KWARGS_PAGE)
+    page_content = pages.page_mapper.get_item(page.page_class)(request=request, request_kwargs=kwargs, page=page)
+    layout = layouts.PCLayout(request=request, request_kwargs=kwargs, page=page_content)
     log.debug('ampcms.views.index - end')
     return HttpResponse(layout.html())
 
 @acl_required()
 def full_page(request, *args, **kwargs):
     log.debug('ampcms.views.full_page - start')
-    page = kwargs.pop('page_model')
-    page_object = pages.page_mapper.get_item(page.page_class)(page=page, request=request, request_kwargs=kwargs)
-    # TODO: need to get the layout based on meta[user_agent]
-    layout = layouts.PCLayout(user=request.user, page=page_object, request=request, request_kwargs=kwargs, block_load=True)
+    page = kwargs.pop(C.EXTRA_KWARGS_PAGE)
+    log.debug('page: %s' % (page))
+    page_content = pages.page_mapper.get_item(page.page_class)(page=page, request=request, request_kwargs=kwargs)
+    layout = layouts.PCLayout(user=request.user, page=page_content, request=request, request_kwargs=kwargs)
     log.debug('ampcms.views.full_page - end')
     return HttpResponse(layout.html())
     
 @acl_required()
 def page(request, *args, **kwargs):
     log.debug('ampcms.views.page - start')
-    page = kwargs.pop('page_model')
-    page_object = pages.page_mapper.get_item(page.page_class)(page=page, request=request, request_kwargs=kwargs)
+    page = kwargs.pop(C.EXTRA_KWARGS_PAGE)
+    log.debug('page: %s' % (page))
+    page_content = pages.page_mapper.get_item(page.page_class)(page=page, request=request, request_kwargs=kwargs)
     log.debug('ampcms.views.page - end')
-    return HttpResponse(page_object.html())
+    return HttpResponse(page_content.html())
 
 @acl_required()
 def pagelet(request, *args, **kwargs):
-    log.debug('ampcms.views.pagelet (%s, %s) - start' % (kwargs.get('pagelet', ''), kwargs.get('url', '')))
-    page = kwargs.pop('page_model')
-    page_object = pages.page_mapper.get_item(page.page_class)(page=page, request=request, request_kwargs=kwargs)
-    pagelet_object = page_object.get_pagelet(kwargs.get('pagelet'))
+    log.debug('ampcms.views.pagelet - start')
+    page= kwargs.pop(C.EXTRA_KWARGS_PAGE)
+    log.debug('page: %s' % (page))
+    page_content = pages.page_mapper.get_item(page.page_class)(page=page, request=request, request_kwargs=kwargs)
+    pagelet_name = kwargs.get(C.URL_KEY_PAGELET)
+    pagelet_url = kwargs.get(C.URL_KEY_PAGELET_URL)
+    log.debug('pagelet: %s - %s' % (pagelet_name, pagelet_url))
+    pagelet_content = page_content.get_pagelet(pagelet_name)
     log.debug('ampcms.views.pagelet - end')
-    if kwargs.get('url'):
-        process_url = '/'+kwargs['url']
+    if pagelet_url:
+        process_url = '/'+pagelet_url
     else:
         process_url = '/'
-    pagelet_json = pagelet_object.json(process_url)
+    pagelet_json = pagelet_content.json(process_url)
     if isinstance(pagelet_json, HttpResponse):
         response = pagelet_json
     else: 
@@ -100,8 +105,8 @@ def css(request, *args, **kwargs):
     # TODO: remove acl_required decorator. Currently needed to be able to load the models correctly.
     ''' Build the css for the page based on page and pagelets '''
     log.debug('ampcms.views.css - start')
-    page = kwargs.pop('page_model')
-    page_object = pages.page_mapper.get_item(page.page_class)(page=page, request=request, request_kwargs=kwargs)
-    layout = layouts.PCLayout(user=request.user, page=page_object, request=request, request_kwargs=kwargs, block_load=True)
+    page = kwargs.pop(C.EXTRA_KWARGS_PAGE)
+    page_content = pages.page_mapper.get_item(page.page_class)(page=page, request=request, request_kwargs=kwargs)
+    layout = layouts.PCLayout(user=request.user, page=page_content, request=request, request_kwargs=kwargs)
     log.debug('ampcms.views.css - end')
     return HttpResponse(layout.css(), mimetype='text/css')

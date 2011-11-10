@@ -38,7 +38,7 @@ class ModuleManager(Manager):
         Get active modules for a given site.
         @param site: AmpCms Site Model instance
         '''
-        modules = self.active().filter(site=site)
+        modules = self.active().filter(site=site).distinct()
         if settings.AMPCMS_CACHING:
             modules.cache(timeout=settings.AMPCMS_CACHING_TIMEOUT)
         return modules
@@ -51,41 +51,45 @@ class ModuleManager(Manager):
         '''
         # Have to import here or causes an import error in from middleware
         from ampcms.models import Page
-        user_modules = self.active_site_modules(site).filter(pages__in=Page.objects.active_user_site_pages(user, site)).distinct()
+        user_site_pages = Page.objects.filter(module__site=site)
+        if not user.is_superuser:
+            user_site_pages.active_user_pages(user)
+        modules = self.active_site_modules(site).filter(pages__in=user_site_pages).distinct()
         if settings.AMPCMS_CACHING:
-            user_modules.cache(timeout=settings.AMPCMS_CACHING_TIMEOUT)
-        return user_modules
+            modules.cache(timeout=settings.AMPCMS_CACHING_TIMEOUT)
+        return modules
 
 class PageManager(Manager):
     use_for_related_fields = True
     
     def active(self):
-        active_pagelets = self.get_query_set().filter(active=True)
-        if settings.AMPCMS_CACHING:
-            active_pagelets.cache(timeout=settings.AMPCMS_CACHING_TIMEOUT)
-        return active_pagelets
-    
-    def active_site_pages(self, site, module=None):
-        pages = self.active().filter(module__site=site)
+        pages = self.get_query_set().filter(active=True).distinct()
         if settings.AMPCMS_CACHING:
             pages.cache(timeout=settings.AMPCMS_CACHING_TIMEOUT)
         return pages
     
-    def active_user_site_pages(self, user, site, module=None):
-        if module is None:
-            user_site_pages = self.active_site_pages(site)
-            if not user.is_superuser:
-                user_site_pages = user_site_pages.filter(Q(user=user) | Q(group__user=user))
-            if settings.AMPCMS_CACHING:
-                user_site_pages.cache(timeout=settings.AMPCMS_CACHING_TIMEOUT)
-        else:
-            user_site_pages = self.active_site_pages(site).filter(module=module)
-            if not user.is_superuser:
-                user_site_pages = user_site_pages.filter(Q(user=user) | Q(group__user=user))
-            user_site_pages = user_site_pages.distinct()
-            if settings.AMPCMS_CACHING:
-                user_site_pages.cache(timeout=settings.AMPCMS_CACHING_TIMEOUT)
-        return user_site_pages
+    def active_user_pages(self, user):
+        pages = self.active()
+        if not user.is_superuser:
+            pages.filter(Q(user=user) | Q(group__user=user))
+        if settings.AMPCMS_CACHING:
+            pages.cache(timeout=settings.AMPCMS_CACHING_TIMEOUT)
+        return pages
+
+    def active_module_pages(self, module):
+        pages = self.active().filter(module=module)
+        if settings.AMPCMS_CACHING:
+            pages.cache(timeout=settings.AMPCMS_CACHING_TIMEOUT)
+        return pages
+    
+    def active_user_module_pages(self, user, module):
+        pages = self.active_module_pages(module)
+        if not user.is_superuser:
+            pages.filter(Q(user=user) | Q(group__user=user))
+        pages.distinct()
+        if settings.AMPCMS_CACHING:
+            pages.cache(timeout=settings.AMPCMS_CACHING_TIMEOUT)
+        return pages
 
 class PageletManager(Manager):
     use_for_related_fields = True
@@ -107,6 +111,8 @@ class PageletManager(Manager):
 
 class SiteManager(DjangoSiteManager):
     def get_by_request(self, request):
+        if request is None:
+            return self.get_current()
         host = request.get_host()
         current_site = self.get_query_set().filter(domain=host)
         if settings.AMPCMS_CACHING:
@@ -114,7 +120,7 @@ class SiteManager(DjangoSiteManager):
         return current_site[0]
 
 if settings.AMPCMS_CACHING:
-    from caching.base import CachingManager
+    from caching.base import CachingManager #@UnresolvedImport
     SiteManager.__bases__ += (CachingManager,)
     ModuleManager.__bases__ = (CachingManager,)
     PageManager.__bases__ = (CachingManager,)

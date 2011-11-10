@@ -15,6 +15,21 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
 
+URL_KEY_MODULE = 'module'
+URL_KEY_PAGE = 'page'
+URL_KEY_PAGELET = 'pagelet'
+URL_KEY_PAGELET_URL = 'pagelet_url'
+
+VIEW_NAME_PAGE = 'page'
+VIEW_NAME_PAGELET = 'pagelet'
+VIEW_NAME_CSS = 'css'
+VIEW_NAME_FULL_PAGE = 'full_page'
+VIEW_NAME_INDEX = 'index'
+
+EXTRA_KWARGS_SITE = 'site_model'
+EXTRA_KWARGS_MODULE = 'module_model'
+EXTRA_KWARGS_PAGE = 'page_model'
+
 USER_ACL_CACHE = '_acl_cache'
 GROUP_ACL_CACHE = '_group_acl_cache'
 
@@ -32,10 +47,9 @@ JSON_KEY_HTML = 'html'
 JSON_KEY_CSS = 'css'
 JSON_KEY_JS = 'js'
 
+HTML_DATA_TAG_PREFIX = 'data-'
 HTML_DATA_TAG_KEY_NAME = 'name'
 HTML_DATA_TAG_KEY_URL = 'url'
 HTML_DATA_TAG_KEY_STARTING_URL = 'starting_url'
 HTML_DATA_TAG_KEY_LOCATION = 'location'
 HTML_DATA_TAG_KEY_APPLICATION = 'application'
-
-HTML_DATA_TAG_PREFIX = 'data-'

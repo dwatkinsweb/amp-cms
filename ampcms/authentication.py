@@ -17,19 +17,24 @@
 
 from django.contrib.auth.backends import ModelBackend
 from ampcms.models import Page, Site
+from ampcms.utils import get_current_request
+from ampcms import const as C
 
 class ACLBackend(ModelBackend):
-    def get_group_permissions(self, user_obj):
-        if not hasattr(user_obj, '_group_acl_cache'):
-            acl = Page.objects.active_site_pages(Site.objects.get_current()).filter(group__user=user_obj).values_list('module__name', 'name').order_by()
-            user_obj._group_acl_cache = set(["%s.%s" % (ct, name) for ct, name in acl])
-        return user_obj._group_acl_cache
+    def get_group_permissions(self, user):
+        if not hasattr(user, C.GROUP_ACL_CACHE):
+            site = Site.objects.get_by_request(get_current_request())
+            acl = Page.objects.filter(module__site=site).filter(user=user).values_list('module__name', 'name').order_by()
+            setattr(user, C.GROUP_ACL_CACHE, set(["%s.%s" % (ct, name) for ct, name in acl]))
+        return getattr(user, C.GROUP_ACL_CACHE)
     
-    def get_all_permissions(self, user_obj):
-        if user_obj.is_anonymous():
+    def get_all_permissions(self, user):
+        if user.is_anonymous():
             return set()
-        if not hasattr(user_obj, '_acl_cache'):
-            acl = Page.objects.active_site_pages(Site.objects.get_current()).filter(user=user_obj).order_by()
-            user_obj._acl_cache = set([u"%s.%s" % (p.module.name, p.name) for p in acl])
-            user_obj._acl_cache.update(self.get_group_permissions(user_obj))
-        return user_obj._acl_cache
+        if not hasattr(user, C.GROUP_ACL_CACHE):
+            site = Site.objects.get_by_request(get_current_request())
+            acl = Page.objects.filter(module__site=site).filter(group__user=user).values_list('module__name', 'name').order_by()
+            acl_cache = set(["%s.%s" % (ct, name) for ct, name in acl])
+            acl_cache.update(self.get_group_permissions(user))
+            setattr(user, C.GROUP_ACL_CACHE, acl_cache)
+        return getattr(user, C.GROUP_ACL_CACHE)

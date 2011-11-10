@@ -18,21 +18,33 @@
 from django.conf.urls.defaults import patterns, url
 
 from ampcms.lib.application_mapper import application_mapper
+from ampcms import const as C
 application_mapper.autodiscover()
 
 urlpatterns = patterns('ampcms.views',
     url(r'^login/?$',
-        view='login', name='login'),
+        view='login',
+        name='login'),
     url(r'^logout/?$',
-        view='logout', name='logout'),
-    url(r'^page/(?P<module>[a-zA-Z0-9]+)/(?P<page>[a-zA-Z0-9]+)/?$', 
-        view='page', name='page'),
-    url(r'^pagelet/(?P<module>[a-zA-Z0-9_]+)/(?P<page>[a-zA-Z0-9_]+)/(?P<pagelet>[a-zA-Z0-9_]+)/?(?P<url>[a-zA-Z0-9\/\-_]+)?', 
-        view='pagelet', name='pagelet'),
-    url(r'^css/(?P<module>[a-zA-Z0-9_]+)/(?P<page>[a-zA-Z0-9_]+)/?$', 
-        view='css', name='css'),
-    url(r'^(?P<module>[a-zA-Z0-9_]+)/?(?P<page>[a-zA-Z0-9_]+)?/?$', 
-        view='full_page', name='full_page'),
+        view='logout',
+        name='logout'),
+    url(r'^page/(?P<%s>[a-zA-Z0-9]+)/(?P<%s>[a-zA-Z0-9]+)/?$'
+            % (C.URL_KEY_MODULE, C.URL_KEY_PAGE),
+        view=C.VIEW_NAME_PAGE,
+        name=C.VIEW_NAME_PAGE),
+    url(r'^pagelet/(?P<%s>[a-zA-Z0-9_]+)/(?P<%s>[a-zA-Z0-9_]+)/(?P<%s>[a-zA-Z0-9_]+)/?(?P<%s>[a-zA-Z0-9\/\-_]+)?'
+            % (C.URL_KEY_MODULE, C.URL_KEY_PAGE, C.URL_KEY_PAGELET, C.URL_KEY_PAGELET_URL),
+        view=C.VIEW_NAME_PAGELET,
+        name=C.VIEW_NAME_PAGELET),
+    url(r'^css/(?P<%s>[a-zA-Z0-9_]+)/(?P<%s>[a-zA-Z0-9_]+)/?$'
+            % (C.URL_KEY_MODULE, C.URL_KEY_PAGE),
+        view=C.VIEW_NAME_CSS,
+        name=C.VIEW_NAME_CSS),
+    url(r'^(?P<%s>[a-zA-Z0-9_]+)/?(?P<%s>[a-zA-Z0-9_]+)?/?$'
+            % (C.URL_KEY_MODULE, C.URL_KEY_PAGE),
+        view=C.VIEW_NAME_FULL_PAGE,
+        name=C.VIEW_NAME_FULL_PAGE),
     url(r'^$', 
-        view='index', name='index')
+        view=C.VIEW_NAME_INDEX,
+        name=C.VIEW_NAME_INDEX)
 )
