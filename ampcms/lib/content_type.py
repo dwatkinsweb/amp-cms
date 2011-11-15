@@ -110,7 +110,7 @@ class BaseContentType(object):
             raise ImproperlyConfigured('No template defined for object %s' % type(self))
         template_list = ['ampcms/%s' % self._template]
         if site.skin is not None:
-            template_list.insert(0, 'ampcms/%s/%s' % (site.skin, self._template))
+            template_list.insert(0, '%s/%s/%s' % (settings.AMPCMS_SKIN_FOLDER, site.skin, self._template))
         return template_list
     
     def _get_context(self):
