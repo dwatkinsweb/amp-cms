@@ -66,12 +66,12 @@ class BaseContentType(object):
             [css_list_unique.append(css) for css in css_list if (css and not css_list_unique.count(css))]
             self._css = []
             for _css in css_list_unique:
-                if settings.MEDIA_URL in _css:
+                if settings.MEDIA_URL in _css or 'HTTP://' in _css:
                     self._css.append('@import url("%s");' % _css)
-                elif site.skin is not None and os.path.exists('%scss/%s/%s' % (settings.MEDIA_ROOT, site.skin, _css)):
-                    self._css.append('@import url("%scss/%s/%s");' % (settings.MEDIA_URL, site.skin, _css))
                 else:
                     self._css.append('@import url("%scss/%s");' % (settings.MEDIA_URL, _css))
+                    if site.skin is not None and os.path.exists('%scss/%s/%s' % (settings.MEDIA_ROOT, site.skin, _css)):
+                        self._css.append('@import url("%scss/%s/%s");' % (settings.MEDIA_URL, site.skin, _css))
             self._css = '\n'.join(self._css)
         return self._css
     
