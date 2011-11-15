@@ -18,3 +18,4 @@
 .inline-mover {width: 4px;}
 td.inline-mover {background: url("/media/ampcms/images/mover.gif") no-repeat center left transparent; cursor: move;}
 .inline-related .original p {margin-left: 30px;}
+#changelist-filter {width: 275px;}

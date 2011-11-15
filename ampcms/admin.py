@@ -128,7 +128,7 @@ class PageAdmin(admin.ModelAdmin):
         ('Names', {'fields': ('name', 'title')}),
         ('Objects', {'fields': ('module', 'page_class', 'application', 'pagelet_layout')}),
         ('Other', {'fields': ('order', 'active')}))
-    list_display = ('full_name', 'name', 'title', 'module', 'page_class', 'active', 'order', 'view_on_site')
+    list_display = ('full_name', 'name', 'title', 'site', 'module', 'page_class', 'active', 'order', 'view_on_site')
     list_filter = ('active', 'module', 'page_class')
     inlines = [PageletInline]
     actions = ['activate', 'deactivate']
@@ -142,6 +142,10 @@ class PageAdmin(admin.ModelAdmin):
         css = {
             'all': ('ampcms/css/admin-extended.css',)
         }
+    
+    def site(self, obj):
+        return obj.module.site
+    site.short_description = 'Site'
     
     def activate(self, request, queryset):
         rows_updated = queryset.update(active=True)
@@ -181,6 +185,11 @@ class PageletAdmin(admin.ModelAdmin):
     list_filter = ('active', 'page', 'pagelet_class')
     inlines = [PageletAttributeInline]
     actions = ['activate', 'deactivate']
+    
+    class Media:
+        css = {
+            'all': ('ampcms/css/admin-extended.css',)
+        }
     
     def full_name(self, obj):
         return '%s.%s.%s' % (obj.page.module.name, obj.page.name, obj.name)

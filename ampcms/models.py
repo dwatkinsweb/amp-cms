@@ -39,7 +39,7 @@ class Site(DjangoSite):
     objects = managers.SiteManager()
 
 class Module(models.Model):
-    name = models.CharField(max_length=30, unique=True)
+    name = models.CharField(max_length=30)
     title = models.CharField(max_length=30)
     order = models.IntegerField(max_length=2, unique=True)
     active = models.BooleanField(default=False)
@@ -61,10 +61,11 @@ class Module(models.Model):
         return self.pages.filter(active=True)
     
     def __unicode__(self):
-        return self.name
+        return '%s/%s' % (self.site, self.name)
     
     class Meta:
-        ordering = ['order']
+        unique_together=(('name','site'),)
+        ordering = ['site', 'order']
 
 class Page(models.Model):
     # TODO: Allow for a many to many relationship between page and pagelet
@@ -85,7 +86,7 @@ class Page(models.Model):
         return '/%s/%s' % (self.module.name, self.name)
     
     def __unicode__(self):
-        return '%s.%s' % (self.module.name, self.name)
+        return '%s/%s' % (self.module, self.name)
     
     class Meta:
         ordering = ['module__order', 'order']
@@ -112,7 +113,7 @@ class Pagelet(models.Model):
         return '/pagelet/%s/%s/%s' % (self.page.module.name, self.page.name, self.name)
     
     def __unicode__(self):
-        return '%s.%s.%s' % (self.page.module.name, self.page.name, self.name)
+        return '%s/%s' % (self.page, self.name)
     
     class Meta:
         ordering = ['page__module__order', 'page__order', 'order']
