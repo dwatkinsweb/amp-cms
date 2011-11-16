@@ -33,5 +33,5 @@ settings.AMPCMS_PAGELET_LAYOUTS = getattr(django_settings, 'AMPCMS_PAGELET_LAYOU
 settings.AMPCMS_PUBLIC_URL = getattr(django_settings, 'AMPCMS_PUBLIC_URL', '/')
 settings.AMPCMS_PERMISSION_DENIED_URL = getattr(django_settings, 'AMPCMS_PERMISSION_DENIED_URL', '/')
 settings.AMPCMS_WYSIWYG = getattr(django_settings, 'AMPCMS_WYSIWYG', False)
-settings.AMPCMS_ROOT_DATABASE = getattr(django_settings, 'AMPCMS_ROOT_DATABASE', 'ampcms')
+settings.AMPCMS_ROOT_DATABASE = getattr(django_settings, 'AMPCMS_ROOT_DATABASE', 'default')
 settings.AMPCMS_SKIN_FOLDER = getattr(django_settings, 'AMPCMS_SKIN_FOLDER', 'ampcms_skins')
