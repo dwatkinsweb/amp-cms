@@ -144,6 +144,7 @@ class ApplicationPagelet(BasePagelet):
         super(ApplicationPagelet, self).__init__(**kwargs)
         self._template = template
         self.process_url = None
+        self.title = self._data_model.title
         
     def html(self, include_content=None):
         return self._to_stream(include_content).render()
@@ -163,6 +164,7 @@ class ApplicationPagelet(BasePagelet):
         @param include_content: Application content.
         '''
         context = super(ApplicationPagelet, self)._get_context()
+        context['title'] = self.title
         if include_content is not None:
             context['content'] = include_content
         return context
@@ -218,6 +220,10 @@ class ApplicationPagelet(BasePagelet):
             if hasattr(response, 'ampcms_media'):
                 self.view_css = response.ampcms_media.css
                 self.view_js = response.ampcms_media.js
+                if response.ampcms_media.title is not None:
+                    self.title = response.ampcms_media.title
+                else:
+                    self.title = self._data_model.title
             return Markup(response.content)
         except Exception, e:
             log.exception('Exception loading application pagelet: %s' % e)

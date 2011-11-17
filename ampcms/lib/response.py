@@ -24,7 +24,8 @@ class AMPCMSAjaxResponse(object):
         self.response = response
 
 class AMPCMSMedia(object):
-    def __init__(self, site, css, js):
+    def __init__(self, site, title, css, js):
+        self.title = title
         self.site = site
         self._css = css
         self.js = js
