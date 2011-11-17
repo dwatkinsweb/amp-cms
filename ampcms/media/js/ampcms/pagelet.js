@@ -196,8 +196,11 @@ define(['ampcms/sandbox'], function(sandbox) {
 						new_url = this._build_url(url);
 						data = core.dom.data(CONTAINER);
 						if(new_url != null && url !== data.location) {
+							core.dom.trigger(CONTAINER, 'ampcms.pagelet.loadstart');
 							core.ajax.get(new_url, function(response) {
+								core.dom.trigger(CONTAINER, 'ampcms.pagelet.loadajaxcomplete');
 								thiz.load_response(response);
+								core.dom.trigger(CONTAINER, 'ampcms.pagelet.loadfullcomplete');
 							});
 						}
 					}

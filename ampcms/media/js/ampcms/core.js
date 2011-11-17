@@ -183,6 +183,9 @@ define(['require', 'ampcms/pagelet', 'ampcms/sandbox', 'libs/history'], function
 			dom : {
 				bind : function(target, event, callback) {
 					HistoryPlugin.Adapter.bind(target, event, callback);
+				},
+				trigger : function(target, event) {
+					HistoryPlugin.Adapter.trigger(target, event);
 				}
 			},
 			utils : {
