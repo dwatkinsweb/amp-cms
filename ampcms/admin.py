@@ -88,8 +88,8 @@ class ModuleAdmin(admin.ModelAdmin):
     
     class Media:
         js = (
-            'ampcms/js/jquery.min.js',
-            'ampcms/js/jquery-ui.min.js',
+            'https://ajax.googleapis.com/ajax/libs/jquery/1.7.0/jquery.min.js',
+            'https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js',
             'ampcms/js/admin/jquery.sortable-result_list.js',
             'ampcms/js/admin/sortable-result_list.js',
             'ampcms/js/admin/jquery.sortable-inline.js',
@@ -135,8 +135,8 @@ class PageAdmin(admin.ModelAdmin):
     
     class Media:
         js = (
-            'ampcms/js/jquery.min.js',
-            'ampcms/js/jquery-ui.min.js',
+            'https://ajax.googleapis.com/ajax/libs/jquery/1.7.0/jquery.min.js',
+            'https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js',
             'ampcms/js/admin/jquery.sortable-inline.js',
             'ampcms/js/admin/sortable-inline.js',)
         css = {

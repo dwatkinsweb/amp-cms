@@ -41,7 +41,7 @@ class Site(DjangoSite):
 class Module(models.Model):
     name = models.CharField(max_length=30)
     title = models.CharField(max_length=30)
-    order = models.IntegerField(max_length=2, unique=True)
+    order = models.IntegerField(max_length=2)
     active = models.BooleanField(default=False)
     site = models.ForeignKey(Site)
 
@@ -64,7 +64,7 @@ class Module(models.Model):
         return '%s/%s' % (self.site, self.name)
     
     class Meta:
-        unique_together=(('name','site'),)
+        unique_together=(('name','site'),('site', 'order'))
         ordering = ['site', 'order']
 
 class Page(models.Model):

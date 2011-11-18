@@ -19,3 +19,5 @@
 td.inline-mover {background: url("/media/ampcms/images/mover.gif") no-repeat center left transparent; cursor: move;}
 .inline-related .original p {margin-left: 30px;}
 #changelist-filter {width: 275px;}
+.change-list .filtered {background: #EFEFEF !important; min-height: 0px !important;}
+.change-list .filtered table, .change-list .filtered .paginator, .filtered #toolbar, .filtered div.xfull {margin-right: 275px !important;}
