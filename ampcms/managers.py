@@ -47,13 +47,14 @@ class ModuleManager(Manager):
         '''
         Get the active modules for a given user and site.
         @param user: AmpCms User Model instance
-        @param site: mpCms Site Model instance
+        @param site: AmpCms Site Model instance
         '''
         # Have to import here or causes an import error in from middleware
         from ampcms.models import Page
-        user_site_pages = Page.objects.filter(module__site=site)
-        if not user.is_superuser:
-            user_site_pages.active_user_pages(user)
+        if user.is_superuser:
+            user_site_pages = Page.objects.filter(module__site=site)
+        else:
+            user_site_pages = Page.objects.active_user_pages(user).filter(module__site=site)
         modules = self.active_site_modules(site).filter(pages__in=user_site_pages).distinct()
         if settings.AMPCMS_CACHING:
             modules.cache(timeout=settings.AMPCMS_CACHING_TIMEOUT)
@@ -71,7 +72,7 @@ class PageManager(Manager):
     def active_user_pages(self, user):
         pages = self.active()
         if not user.is_superuser:
-            pages.filter(Q(user=user) | Q(group__user=user))
+            pages = pages.filter(Q(user=user) | Q(group__user=user))
         if settings.AMPCMS_CACHING:
             pages.cache(timeout=settings.AMPCMS_CACHING_TIMEOUT)
         return pages
@@ -85,8 +86,8 @@ class PageManager(Manager):
     def active_user_module_pages(self, user, module):
         pages = self.active_module_pages(module)
         if not user.is_superuser:
-            pages.filter(Q(user=user) | Q(group__user=user))
-        pages.distinct()
+            pages = pages.filter(Q(user=user) | Q(group__user=user))
+        pages = pages.distinct()
         if settings.AMPCMS_CACHING:
             pages.cache(timeout=settings.AMPCMS_CACHING_TIMEOUT)
         return pages
