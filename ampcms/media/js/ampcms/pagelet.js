@@ -253,7 +253,7 @@ define(['ampcms/sandbox'], function(sandbox) {
 						if (typeof href !== 'undefined') {
 							href = href.replace(/^.*\.com/, '');
 							core.dom.attr(anchor, 'href', '#' + href);
-							transformed_anchors.push(anchor)
+							transformed_anchors.push(anchor);
 						}
 					}
 					core.dom.bind(transformed_anchors, 'click', function(event) {
