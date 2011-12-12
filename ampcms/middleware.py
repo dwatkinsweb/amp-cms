@@ -27,7 +27,7 @@ class UserManagement:
     def process_request(self, request):
         if request.user.is_authenticated():
             try:
-                request.user = User.objects.get(pk=request.user.id)
+                request.user = User.objects.get(pk=request.user.pk)
             except User.DoesNotExist:
                 log.exception('Error replacing user %s with custom user object' % request.user)
                 raise Http404

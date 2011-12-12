@@ -24,6 +24,7 @@ from ampcms.lib.content_type import BaseContentType
 from ampcms.lib.content_type_mapper import ContentTypeMapper
 from ampcms.lib.application_mapper import application_mapper
 from ampcms.lib.response import AMPCMSAjaxResponse
+from ampcms.http import FullHttpResponseRedirect
 from ampcms import const as C
 
 import json
@@ -179,11 +180,15 @@ class ApplicationPagelet(BasePagelet):
         application_content = self._build_content()
         if isinstance(application_content, AMPCMSAjaxResponse):
             return application_content.response
+        elif isinstance(application_content, FullHttpResponseRedirect):
+            return json.dumps({C.JSON_KEY_REDIRECT: True,
+                               C.JSON_KEY_LOCATION: application_content['location']})
         elif isinstance(application_content, HttpResponseRedirect):
             return application_content
         else:
             html = self.html(include_content=application_content)
-            return json.dumps({C.JSON_KEY_NAME: self._data_model.name,
+            return json.dumps({C.JSON_KEY_REDIRECT: False,
+                               C.JSON_KEY_NAME: self._data_model.name,
                                C.JSON_KEY_LOCATION: self.process_url,
                                C.JSON_KEY_HTML: Markup(html),
                                C.JSON_KEY_CSS: self._build_css(),
@@ -211,11 +216,15 @@ class ApplicationPagelet(BasePagelet):
             if isinstance(response, AMPCMSAjaxResponse):
                 # If it's an AMPCMSAjaxResponse, return as is
                 return response
+            elif isinstance(response, FullHttpResponseRedirect):
+                return response
             elif isinstance(response, HttpResponseRedirect):
                 # If it's a redirect, build the content based on new url
-                log.debug('Redirecting to %s' % response['location'])
+                log.debug('Received redirect of %s' % response['location'])
                 # TODO: I don't like the way this is removing the prefix out of the url but couldn't think of anything better atm.
-                response['location'] = '%s%s' % (self._data_model.get_absolute_url(), response['location'].replace('/%s' % application.url_prefix, '', 1))
+                if response['location'].startswith('/%s/' % application.url_prefix):
+                    response['location'] = '%s%s' % (self._data_model.get_absolute_url(), response['location'].replace('/%s' % application.url_prefix, '', 1))
+                log.debug('Redirecting to %s' % response['location'])
                 return response
             if hasattr(response, 'ampcms_media'):
                 self.view_css = response.ampcms_media.css

@@ -162,6 +162,9 @@ define(['ampcms/sandbox'], function(sandbox) {
 					var thiz = this
 					core.log(response);
 					this.unregister_all();
+					if (typeof response.redirect !== 'undefined' && response.redirect) {
+						core.redirect(response.location);
+					}
 					if (response.css.length > 0) {
 						core.load_css(response.css);
 					}

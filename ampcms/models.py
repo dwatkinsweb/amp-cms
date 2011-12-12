@@ -16,6 +16,7 @@
 #-------------------------------------------------------------------------------
 
 from django.db import models  
+from django.db.models.signals import post_save
 from django.contrib.auth.models import User as DjangoUser, Group as DjangoGroup
 from django.contrib.sites.models import Site as DjangoSite
 
@@ -220,3 +221,18 @@ def get_private_module_and_page(site, module_name, page_name, user):
         raise PageDoesNotExist(e)
     
     return (module, page)
+
+def create_user_profile(sender, instance, created, **kwargs):
+    if created:
+        user, user_created = User.objects.get_or_create(pk=instance.id,
+                                                        defaults={'username':instance.username,
+                                                                  'first_name':instance.first_name,
+                                                                  'last_name':instance.last_name,
+                                                                  'email':instance.email,
+                                                                  'password':instance.password,
+                                                                  'is_staff':instance.is_staff,
+                                                                  'is_active':instance.is_active,
+                                                                  'is_superuser':instance.is_superuser,
+                                                                  'last_login':instance.last_login,
+                                                                  'date_joined':instance.date_joined})
+post_save.connect(create_user_profile, sender=DjangoUser)
