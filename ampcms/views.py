@@ -39,7 +39,7 @@ def login(request, *args, **kwargs):
         return response
     site = Site.objects.get_by_request(request)
     if site.skin is not None:
-        base_template = 'ampcms_skins/%s/base.html' % site.skin
+        base_template = '%s/%s/base.html' % (settings.AMPCMS_SKIN_FOLDER, site.skin)
     else:
         base_template = 'base.html'
     context = RequestContext(request)
