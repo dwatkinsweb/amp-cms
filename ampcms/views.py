@@ -17,6 +17,7 @@
 
 from ampcms.lib import layouts, pages
 from ampcms.decorators import acl_required
+from ampcms.models import Site
 from ampcms import const as C
 from django.core.urlresolvers import resolve
 from django.http import HttpResponse, HttpResponseRedirect
@@ -36,9 +37,14 @@ def login(request, *args, **kwargs):
     response = view(request, *args, **kwargs)
     if isinstance(response, HttpResponseRedirect):
         return response
-    
+    site = Site.objects.get_by_request(request)
+    if site.skin is not None:
+        base_template = 'ampcms_skins/%s/base.html' % site.skin
+    else:
+        base_template = 'base.html'
     context = RequestContext(request)
-    context.update({'content': Markup(response.content)})
+    context['content'] = Markup(response.content)
+    context['base'] = base_template
     response = render_to_response('ampcms/login.html', context)
     return response
 
