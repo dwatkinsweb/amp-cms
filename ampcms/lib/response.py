@@ -15,6 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
 
+from django.http import HttpResponseRedirect, HttpResponse
 from django.conf import settings
 
 import os
@@ -42,4 +43,9 @@ class AMPCMSMedia(object):
                 css = '%scss/%s' % (settings.MEDIA_URL, css)
             css_files.append(css)
         return css_files
-    
+
+class HttpResponseFullRedirect(HttpResponseRedirect):
+    pass
+
+class HttpFixedResponse(HttpResponse):
+    pass
