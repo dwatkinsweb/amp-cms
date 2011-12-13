@@ -79,7 +79,7 @@ class ModuleForm(forms.ModelForm):
 class ModuleAdmin(admin.ModelAdmin):
     fieldsets = (
         ('Names', {'fields': ('name', 'title')}),
-        ('Other', {'fields': ('site', 'active',)}))
+        ('Other', {'fields': ('site', 'order', 'active',)}))
     list_display = ('name', 'title', 'active', 'order', 'site', 'view_on_site')
     list_filter = ('active','site')
     list_editable = ('order',)
