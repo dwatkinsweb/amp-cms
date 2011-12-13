@@ -18,7 +18,7 @@
 from genshi.core import Markup #@UnresolvedImport
 from django_genshi.shortcuts import render_to_stream #@UnresolvedImport
 from django.http import HttpResponseRedirect
-from django.core.urlresolvers import resolve
+from django.core.urlresolvers import resolve, set_urlconf
 
 from ampcms.lib.content_type import BaseContentType
 from ampcms.lib.content_type_mapper import ContentTypeMapper
@@ -209,19 +209,16 @@ class ApplicationPagelet(BasePagelet):
             self.process_url = self.process_url
         try:
             application = application_mapper.get_item(self._data_model.application)
-            view, args, kwargs = resolve(self.process_url, application.urlconf)
+            set_urlconf(application.urlconf)
+            view, args, kwargs = resolve(self.process_url)
             self.request.is_ampcms = True
             response = view(self.request, *args, **kwargs)
             if isinstance(response, AMPCMSAjaxResponse) or isinstance(response, HttpResponseFullRedirect) or isinstance(response, HttpFixedResponse):
                 # These responses return as is
                 return response
             elif isinstance(response, HttpResponseRedirect):
-                # If it's a redirect, build the content based on new url
-                log.debug('Received redirect of %s' % response['location'])
-                # TODO: I don't like the way this is removing the prefix out of the url but couldn't think of anything better atm.
-                if response['location'].startswith('/%s/' % application.url_prefix):
-                    response['location'] = '%s%s' % (self._data_model.get_absolute_url(), response['location'].replace('/%s' % application.url_prefix, '', 1))
                 log.debug('Redirecting to %s' % response['location'])
+                response['location'] = '%s%s' % (self._data_model.get_absolute_url(), response['location'])
                 return response
             if hasattr(response, 'ampcms_media'):
                 self.view_css = response.ampcms_media.css
@@ -230,8 +227,10 @@ class ApplicationPagelet(BasePagelet):
                     self.title = response.ampcms_media.title
                 else:
                     self.title = self._data_model.title
+            set_urlconf(None)
             return Markup(response.content)
         except Exception, e:
+            set_urlconf(None)
             log.exception('Exception loading application pagelet: %s' % e)
             raise
 
