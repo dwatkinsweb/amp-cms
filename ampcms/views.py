@@ -28,8 +28,9 @@ from genshi.core import Markup #@UnresolvedImport
 import logging
 log = logging.getLogger(__name__)
 
-def login(request, *args, **kwargs):
-    view, args, kwargs = resolve(settings.AMPCMS_LOGIN_URL, settings.AMPCMS_LOGIN_URLCONF)
+def account_handling(request, *args, **kwargs):
+    view_url = kwargs.get('url', '/login')
+    view, args, kwargs = resolve(view_url, settings.AMPCMS_ACCOUNT_URLCONF)
     if request.GET.has_key('next'):
         kwargs.update({'callback_url': request.GET['next']})
     else:
@@ -49,7 +50,7 @@ def login(request, *args, **kwargs):
     return response
 
 def logout(request, *args, **kwargs):
-    view, args, kwargs = resolve(settings.AMPCMS_LOGOUT_URL, settings.AMPCMS_LOGOUT_URLCONF)
+    view, args, kwargs = resolve(settings.AMPCMS_ACCOUNT_LOGOUT_URL, settings.AMPCMS_ACCOUNT_URLCONF)
     kwargs.update({'callback_url': '/login'})
     return view(request, *args, **kwargs)
 

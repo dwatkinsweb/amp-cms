@@ -18,16 +18,28 @@
 from django.conf.urls.defaults import patterns, url
 
 from ampcms.lib.application_mapper import application_mapper
+from ampcms.conf import settings
 from ampcms import const as C
+
 application_mapper.autodiscover()
 
 urlpatterns = patterns('ampcms.views',
     url(r'^login/?$',
-        view='login',
-        name='login'),
+        view='account_handling',
+        name='login',
+        kwargs={'url':settings.AMPCMS_ACCOUNT_LOGIN_URL}),
     url(r'^logout/?$',
-        view='logout',
+        view='account_handling',
         name='logout'),
+    url(r'^register/?$',
+        view='account_handling',
+        name='register',
+        kwargs={'url':settings.AMPCMS_ACCOUNT_REGISTER_URL,
+                'allow_registration':settings.AMPCMS_ACCOUNT_ALLOW_REGISTRATION}),
+    url(r'^forgot_password/?$',
+        view='forgot_password',
+        name='forgot_password',
+        kwargs={'url':settings.AMPCMS_ACCOUNT_FORGOT_PASSWORD_URL}),
     url(r'^page/(?P<%s>[a-zA-Z0-9]+)/(?P<%s>[a-zA-Z0-9]+)/?$'
             % (C.URL_KEY_MODULE, C.URL_KEY_PAGE),
         view=C.VIEW_NAME_PAGE,
