@@ -37,7 +37,7 @@ urlpatterns = patterns('ampcms.views',
         kwargs={'url':settings.AMPCMS_ACCOUNT_REGISTER_URL,
                 'allow_registration':settings.AMPCMS_ACCOUNT_ALLOW_REGISTRATION}),
     url(r'^forgot_password/?$',
-        view='forgot_password',
+        view='account_handling',
         name='forgot_password',
         kwargs={'url':settings.AMPCMS_ACCOUNT_FORGOT_PASSWORD_URL}),
     url(r'^page/(?P<%s>[a-zA-Z0-9]+)/(?P<%s>[a-zA-Z0-9]+)/?$'
