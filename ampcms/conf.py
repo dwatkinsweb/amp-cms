@@ -29,6 +29,7 @@ settings.AMPCMS_ACCOUNT_URLCONF = getattr(django_settings, 'AMPCMS_ACCOUNT_URLCO
 settings.AMPCMS_ACCOUNT_LOGIN_URL = getattr(django_settings, 'AMPCMS_ACCOUNT_LOGIN_URL', '/login')
 settings.AMPCMS_ACCOUNT_REGISTER_URL = getattr(django_settings, 'AMPCMS_ACCOUNT_REGISTER_URL', '/register')
 settings.AMPCMS_ACCOUNT_FORGOT_PASSWORD_URL = getattr(django_settings, 'AMPCMS_ACCOUNT_FORGOT_PASSWORD_URL', '/forgot_password')
+settings.AMPCMS_ACCOUNT_UPDATE_PASSWORD_URL = getattr(django_settings, 'AMPCMS_ACCOUNT_UPDATE_PASSWORD_URL', '/update_password')
 settings.AMPCMS_LOGOUT_URL = getattr(django_settings, 'AMPCMS_ACCOUNT_LOGOUT_URL', '/logout')
 settings.AMPCMS_ACCOUNT_ALLOW_REGISTRATION = getattr(django_settings, 'AMPCMS_ACCOUNT_ALLOW_REGISTRATION', False)
 settings.AMPCMS_PAGELET_LAYOUTS = getattr(django_settings, 'AMPCMS_PAGELET_LAYOUTS', [])
