@@ -17,14 +17,16 @@
 
 from genshi.core import Markup #@UnresolvedImport
 from django_genshi.shortcuts import render_to_stream #@UnresolvedImport
-from django.http import HttpResponseRedirect
-from django.core.urlresolvers import resolve, set_urlconf
+from django.http import HttpResponseRedirect, Http404
+from django.core.urlresolvers import resolve, set_urlconf, get_resolver
 
 from ampcms.lib.content_type import BaseContentType
 from ampcms.lib.content_type_mapper import ContentTypeMapper
 from ampcms.lib.application_mapper import application_mapper
 from ampcms.lib.response import AMPCMSAjaxResponse, HttpFixedResponse, HttpResponseFullRedirect, HttpResponseSSLRedirect
 from ampcms import const as C
+
+from ampcms.conf import settings
 
 import json
 import urllib
@@ -237,7 +239,16 @@ class ApplicationPagelet(BasePagelet):
         except Exception, e:
             set_urlconf(None)
             log.exception('Exception loading application pagelet: %s' % e)
-            raise
+            resolver = get_resolver(None)
+            if isinstance(e, Http404):
+                self.title = settings.AMPCMS_404_TITLE
+                error_view, kwargs = resolver.resolve404()
+            else:
+                self.title = settings.AMPCMS_500_TITLE
+                error_view, kwargs = resolver.resolve500()
+            kwargs['exception'] = e
+            error_response = error_view(self.request, **kwargs)
+            return Markup(error_response.content)
 
     def _get_html_data(self):
         '''

@@ -38,3 +38,5 @@ settings.AMPCMS_PERMISSION_DENIED_URL = getattr(django_settings, 'AMPCMS_PERMISS
 settings.AMPCMS_WYSIWYG = getattr(django_settings, 'AMPCMS_WYSIWYG', False)
 settings.AMPCMS_ROOT_DATABASE = getattr(django_settings, 'AMPCMS_ROOT_DATABASE', 'default')
 settings.AMPCMS_SKIN_FOLDER = getattr(django_settings, 'AMPCMS_SKIN_FOLDER', 'ampcms_skins')
+settings.AMPCMS_404_TITLE = getattr(django_settings, 'AMPCMS_404_TITLE', 'Page Not Found')
+settings.AMPCMS_500_TITLE = getattr(django_settings, 'AMPCMS_500_TITLE', 'Error Processing Request')
