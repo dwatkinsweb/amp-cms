@@ -64,24 +64,18 @@ class BasePagelet(BaseContentType):
         '''
         Build the css based on any pagelet attributes
         '''
-        css = self._data_model.css_files
+        css = self.view_css
         if css is not None and not isinstance(css, list):
             css = [val.strip() for val in css.split(',')]
-        else:
-            css = []
-        css += self.view_css
         return filter(None, css)
     
     def _build_js(self):
         '''
         Build the js based on any pagelet attributes
         '''
-        js = self._data_model.js_files
+        js = self.view_js
         if js is not None and not isinstance(js, list):
             js = [val.strip() for val in js.split(',')]
-        else:
-            js = []
-        js += self.view_js
         return filter(None, js)
 
 class MenuPagelet(BasePagelet):

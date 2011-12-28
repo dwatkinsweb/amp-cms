@@ -72,8 +72,6 @@ class Page(models.Model):
     name = models.CharField(max_length=30)
     title = models.CharField(max_length=30)
     page_class = models.CharField(max_length=30, choices=[(page_name, page_name) for page_name, page in page_mapper.items])
-    application = models.CharField(max_length=30, blank=True, null=True,
-                                   choices=[(application_name, application_name) for application_name, application in application_mapper.items])
     order = models.IntegerField()
     active = models.BooleanField(default=False)
     module = models.ForeignKey(Module, related_name='pages')
@@ -99,8 +97,6 @@ class Pagelet(models.Model):
     application = models.CharField(max_length=30, blank=True, null=True,
                                    choices=[(application_name, application_name) for application_name, application in application_mapper.items])
     starting_url = models.CharField(max_length=50, blank=True, null=True)
-    css_files = models.CharField(max_length=255, blank=True, null=True)
-    js_files = models.CharField(max_length=255, blank=True, null=True)
     classes = models.CharField(max_length=50, blank=True, null=True)
     content = models.TextField(blank=True, null=True)
     order = models.IntegerField()

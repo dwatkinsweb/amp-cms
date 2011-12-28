@@ -89,11 +89,7 @@ class ModuleAdmin(admin.ModelAdmin):
     class Media:
         js = (
             'https://ajax.googleapis.com/ajax/libs/jquery/1.7.0/jquery.min.js',
-            'https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js',
-            'ampcms/js/admin/jquery.sortable-result_list.js',
-            'ampcms/js/admin/sortable-result_list.js',
-            'ampcms/js/admin/jquery.sortable-inline.js',
-            'ampcms/js/admin/sortable-inline.js',)
+            'https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js',)
         css = {
             'all': ('ampcms/css/admin-extended.css',)
         }
@@ -126,19 +122,18 @@ class ModuleAdmin(admin.ModelAdmin):
 class PageAdmin(admin.ModelAdmin):
     fieldsets = (
         ('Names', {'fields': ('name', 'title')}),
-        ('Objects', {'fields': ('module', 'page_class', 'application', 'pagelet_layout')}),
+        ('Objects', {'fields': ('module', 'page_class')}),
         ('Other', {'fields': ('order', 'active')}))
     list_display = ('full_name', 'name', 'title', 'site', 'module', 'page_class', 'active', 'order', 'view_on_site')
     list_filter = ('active', 'module', 'page_class')
+    list_editable = ('order',)
     inlines = [PageletInline]
     actions = ['activate', 'deactivate']
     
     class Media:
         js = (
             'https://ajax.googleapis.com/ajax/libs/jquery/1.7.0/jquery.min.js',
-            'https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js',
-            'ampcms/js/admin/jquery.sortable-inline.js',
-            'ampcms/js/admin/sortable-inline.js',)
+            'https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js',)
         css = {
             'all': ('ampcms/css/admin-extended.css',)
         }
@@ -179,7 +174,7 @@ class PageAdmin(admin.ModelAdmin):
 class PageletAdmin(admin.ModelAdmin):
     fieldsets = (
         ('Names', {'fields': ('name', 'title')}),
-        ('Objects', {'fields': ('page', 'pagelet_class', 'application', 'starting_url', 'js_files', 'css_files', 'classes', 'content')}),
+        ('Objects', {'fields': ('page', 'pagelet_class', 'application', 'starting_url', 'classes', 'content')}),
         ('Other', {'fields': ('order', 'active')}))
     list_display = ('full_name', 'name', 'title', 'page', 'active', 'pagelet_class', 'order')
     list_filter = ('active', 'page', 'pagelet_class')
@@ -219,8 +214,6 @@ if settings.AMPCMS_WYSIWYG == 'ckeditor':
         content = forms.CharField(widget=CKEditorWidget())
         class Meta:
             model = Pagelet
-        class Media:
-            js = ('/media/ckeditor/ckeditor/ckeditor.js',)
     PageletAdmin.form = PageletAdminForm
 
 admin.site.register(User, UserAdmin)
