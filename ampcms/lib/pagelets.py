@@ -23,10 +23,11 @@ from django.core.urlresolvers import resolve, set_urlconf
 from ampcms.lib.content_type import BaseContentType
 from ampcms.lib.content_type_mapper import ContentTypeMapper
 from ampcms.lib.application_mapper import application_mapper
-from ampcms.lib.response import AMPCMSAjaxResponse, HttpFixedResponse, HttpResponseFullRedirect
+from ampcms.lib.response import AMPCMSAjaxResponse, HttpFixedResponse, HttpResponseFullRedirect, HttpResponseSSLRedirect
 from ampcms import const as C
 
 import json
+import urllib
 
 import logging
 log = logging.getLogger(__name__)
@@ -213,6 +214,10 @@ class ApplicationPagelet(BasePagelet):
             view, args, kwargs = resolve(self.process_url)
             self.request.is_ampcms = True
             response = view(self.request, *args, **kwargs)
+            if isinstance(response, HttpResponseSSLRedirect):
+                pagelet_params = urllib.urlencode({'%s-pagelet' % self._data_model.name: self.process_url})
+                redirect_url = 'https://%s%s?%s' % (self.request.get_host(), self._data_model.page.get_absolute_url(), pagelet_params)
+                return HttpResponseFullRedirect(redirect_url)
             if isinstance(response, AMPCMSAjaxResponse) or isinstance(response, HttpResponseFullRedirect) or isinstance(response, HttpFixedResponse):
                 # These responses return as is
                 return response

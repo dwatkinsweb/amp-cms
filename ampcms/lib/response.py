@@ -24,6 +24,9 @@ class AMPCMSAjaxResponse(object):
     def __init__(self, response):
         self.response = response
 
+class HttpResponseSSLRedirect(object):
+    pass
+
 class AMPCMSMedia(object):
     def __init__(self, site, title, css, js):
         self.title = title

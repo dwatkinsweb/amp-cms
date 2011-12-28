@@ -17,7 +17,7 @@
 
 from ampcms.models import Site, get_public_module_and_page, get_private_module_and_page
 from ampcms.lib.exceptions import PageDoesNotExist
-from ampcms.lib.response import AMPCMSAjaxResponse, AMPCMSMedia
+from ampcms.lib.response import AMPCMSAjaxResponse, HttpResponseSSLRedirect, AMPCMSMedia
 from ampcms import const as C
 from django.utils.functional import wraps
 from django.utils.decorators import available_attrs
@@ -83,9 +83,12 @@ def acl_required(function=None, login_url=settings.AMPCMS_ACCOUNT_LOGIN_URL, pub
         return actual_decorator(function)
     return actual_decorator
 
-def ampcms_view(title=None, css_files=[], js_files=[]):
+def ampcms_view(title=None, css_files=[], js_files=[], ssl_required=False):
     def decorator(view_func):
         def wrapped_view(request, *args, **kwargs):
+            if hasattr(request, 'is_ampcms') and request.is_ampcms:
+                if ssl_required and not request.is_secure():
+                    return HttpResponseSSLRedirect()
             response = view_func(request, *args, **kwargs)
             # Only apply changes if coming from ampcms
             if hasattr(request, 'is_ampcms') and request.is_ampcms:
