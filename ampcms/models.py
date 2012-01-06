@@ -21,7 +21,7 @@ from django.contrib.auth.models import User as DjangoUser, Group as DjangoGroup
 from django.contrib.sites.models import Site as DjangoSite
 
 from ampcms import managers
-from ampcms.lib.exceptions import PageDoesNotExist
+from ampcms.lib.exceptions import PageDoesNotExist, NoPermissions
 from ampcms.lib.pages import page_mapper
 from ampcms.lib.pagelets import pagelet_mapper
 from ampcms.lib.application_mapper import application_mapper
@@ -195,7 +195,7 @@ def get_private_module_and_page(site, module_name, page_name, user):
             except IndexError, e:
                 message = 'Unable to get default page and module for user %s' % user
                 log.warning(message)
-                raise PageDoesNotExist(message)
+                raise NoPermissions(message)
             else:
                 module = page.module
         else:

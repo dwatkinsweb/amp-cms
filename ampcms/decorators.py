@@ -16,14 +16,14 @@
 #-------------------------------------------------------------------------------
 
 from ampcms.models import Site, get_public_module_and_page, get_private_module_and_page
-from ampcms.lib.exceptions import PageDoesNotExist
+from ampcms.lib.exceptions import PageDoesNotExist, NoPermissions
 from ampcms.lib.response import AMPCMSAjaxResponse, HttpResponseSSLRedirect, AMPCMSMedia
 from ampcms import const as C
 from django.utils.functional import wraps
 from django.utils.decorators import available_attrs
 from django.utils.http import urlquote
 from django.http import HttpResponseRedirect
-from django.conf import settings
+from ampcms.conf import settings
 
 import logging
 log = logging.getLogger(__name__)
@@ -47,8 +47,10 @@ def user_passes_test(function, login_url=settings.AMPCMS_ACCOUNT_LOGIN_URL, publ
                 # Attempt to load module and page
                 try:
                     module, page = get_private_module_and_page(site, module_name, page_name, request.user)
-                except (PageDoesNotExist):
+                except PageDoesNotExist:
                     return HttpResponseRedirect(permission_denied_url)
+                except NoPermissions:
+                    return HttpResponseRedirect(settings.AMPCMS_ACCOUNT_NO_PERMISSIONS_URL)
                 else:
                     log.info('Successfully loaded module and page: User %s viewing page %s.%s' 
                               % (request.user.username, module.name, page.name))

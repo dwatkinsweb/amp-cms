@@ -30,12 +30,13 @@ log = logging.getLogger(__name__)
 
 def account_handling(request, *args, **kwargs):
     view_url = kwargs.get('url', '/login')
-    view, args, kwargs = resolve(view_url, settings.AMPCMS_ACCOUNT_URLCONF)
+    view, view_args, view_kwargs = resolve(view_url, settings.AMPCMS_ACCOUNT_URLCONF)
     if request.GET.has_key('next'):
         kwargs.update({'callback_url': request.GET['next']})
     else:
         kwargs.update({'callback_url': '/'})
-    response = view(request, *args, **kwargs)
+    request.is_ampcms = True
+    response = view(request, *view_args, **view_kwargs)
     if isinstance(response, HttpResponseRedirect):
         return response
     site = Site.objects.get_by_request(request)
@@ -46,7 +47,11 @@ def account_handling(request, *args, **kwargs):
     context = RequestContext(request)
     context['content'] = Markup(response.content)
     context['base'] = base_template
-    response = render_to_response('ampcms/login.html', context)
+    if hasattr(response, 'ampcms_media'):
+        context['title'] = response.ampcms_media.title
+    else:
+        context['title'] = kwargs.get('title')
+    response = render_to_response('ampcms/account_handling.html', context)
     return response
 
 def logout(request, *args, **kwargs):
