@@ -178,7 +178,11 @@ class ApplicationPagelet(BasePagelet):
             return application_content.response
         elif isinstance(application_content, HttpResponseFullRedirect):
             return json.dumps({C.JSON_KEY_REDIRECT: True,
-                               C.JSON_KEY_LOCATION: application_content['location']})
+                               C.JSON_KEY_NAME: self._data_model.name,
+                               C.JSON_KEY_LOCATION: application_content['location'],
+                               C.JSON_KEY_HTML: '',
+                               C.JSON_KEY_CSS: self._build_css(),
+                               C.JSON_KEY_JS: self._build_js()})
         elif isinstance(application_content, HttpResponseRedirect) or isinstance(application_content, HttpFixedResponse):
             return application_content
         else:
@@ -188,8 +192,7 @@ class ApplicationPagelet(BasePagelet):
                                C.JSON_KEY_LOCATION: self.process_url,
                                C.JSON_KEY_HTML: Markup(html),
                                C.JSON_KEY_CSS: self._build_css(),
-                               C.JSON_KEY_JS: self._build_js(),
-                               })
+                               C.JSON_KEY_JS: self._build_js()})
     
     def _build_content(self, process_url=None):
         '''
