@@ -248,7 +248,7 @@ define(['ampcms/sandbox'], function(sandbox) {
 				},
 				_transform_links : function() {
 					var thiz = this, anchor, anchors, transformed_anchors, href, _i, _len;
-					anchors = CONTAINER.find('a[target!=_blank]');
+					anchors = CONTAINER.find('a[target!=_blank][data-ampcms-transform!=ignore]');
 					transformed_anchors = [];
 					for( _i = 0, _len = anchors.length; _i < _len; _i++) {
 						anchor = anchors[_i];
