@@ -56,6 +56,9 @@ define(function() {
 				},
 				redirect : function(url) {
 					pagelet.redirect(url);
+				},
+				transform_links : function() {
+					pagelet._transform_links(CONTAINER);
 				}
 			};
 			sandbox = pagelet.extend(sandbox, this.extension.create(pagelet, CONTAINER));

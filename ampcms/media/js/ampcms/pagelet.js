@@ -246,16 +246,21 @@ define(['ampcms/sandbox'], function(sandbox) {
 					core.dom.replace(CONTAINER, html);
 					CONTAINER = this.__CONTAINER = core.dom.find('#' + pagelet_selector);
 				},
-				_transform_links : function() {
+				_transform_links : function(container_element) {
+					if (typeof container_element === 'undefined') {
+						container_element = CONTAINER;
+					}
 					var thiz = this, anchor, anchors, transformed_anchors, href, _i, _len;
-					anchors = CONTAINER.find('a[target!=_blank][data-ampcms-transform!=ignore]');
+					anchors = container_element.find('a[target!=_blank][data-ampcms-transform!=ignore]');
 					transformed_anchors = [];
 					for( _i = 0, _len = anchors.length; _i < _len; _i++) {
 						anchor = anchors[_i];
 						href = core.dom.attr(anchor, 'href');
 						if (typeof href !== 'undefined') {
 							href = href.replace(/^.*\.com/, '');
-							core.dom.attr(anchor, 'href', '#' + href);
+							if (href[0] != '#') {
+								core.dom.attr(anchor, 'href', '#' + href);
+							}
 							transformed_anchors.push(anchor);
 						}
 					}
