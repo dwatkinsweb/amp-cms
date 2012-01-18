@@ -252,34 +252,36 @@ define(['require', 'ampcms/pagelet', 'ampcms/sandbox', 'libs/history'], function
 			config : function(ampcms_config) {
 				this.log('loading configurations');
 				var thiz = this, extensions = [], extension_targets = [], i = 0;
-				if (typeof ampcms_config.config !== 'undefined') {
-					config = this.extend(config, ampcms_config.config);
-				}
-				if (typeof ampcms_config.extensions.core !== 'undefined') {
-					extensions[i] = ampcms_config.extensions.core;
-					extension_targets[i] = this;
-					i += 1;
-				}
-				if (typeof ampcms_config.extensions.pagelet !== 'undefined') {
-					extensions[i] = ampcms_config.extensions.pagelet;
-					extension_targets[i] = pagelet.extension;
-					i += 1;
-				}
-				if (typeof ampcms_config.extensions.sandbox !== 'undefined') {
-					extensions[i] = ampcms_config.extensions.sandbox;
-					extension_targets[i] = sandbox.extension;
-				}
-				require(extensions, function(){
-					var _i, _len, target_object, mixin_object;
-					for (_i = 0, _len = arguments.length; _i < _len; _i++) {
-						target_object = extension_targets[_i];
-						mixin_object = arguments[_i];
-						target_object = core.extend(target_object, mixin_object);
+				if (typeof ampcms_config !== 'undefined') {
+					if (typeof ampcms_config.config !== 'undefined') {
+						config = this.extend(config, ampcms_config.config);
 					}
-					// TODO: Don't really want to add page here but need it for some stuff in pagelet.
-					thiz.page = PAGE = thiz.dom.find('#page');
-					thiz.load_pagelets();
-				});
+					if (typeof ampcms_config.extensions.core !== 'undefined') {
+						extensions[i] = ampcms_config.extensions.core;
+						extension_targets[i] = this;
+						i += 1;
+					}
+					if (typeof ampcms_config.extensions.pagelet !== 'undefined') {
+						extensions[i] = ampcms_config.extensions.pagelet;
+						extension_targets[i] = pagelet.extension;
+						i += 1;
+					}
+					if (typeof ampcms_config.extensions.sandbox !== 'undefined') {
+						extensions[i] = ampcms_config.extensions.sandbox;
+						extension_targets[i] = sandbox.extension;
+					}
+					require(extensions, function(){
+						var _i, _len, target_object, mixin_object;
+						for (_i = 0, _len = arguments.length; _i < _len; _i++) {
+							target_object = extension_targets[_i];
+							mixin_object = arguments[_i];
+							target_object = core.extend(target_object, mixin_object);
+						}
+						// TODO: Don't really want to add page here but need it for some stuff in pagelet.
+						thiz.page = PAGE = thiz.dom.find('#page');
+						thiz.load_pagelets();
+					});
+				}
 			},
 			extend : function(destination, source) {
 				for (var k in source) {

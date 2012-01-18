@@ -4,11 +4,13 @@
 		  type="text/css" 
 		  id="page-css" 
 		  href="/css${children['page'].get_absolute_url()}" />
-	<script py:match="modulejs" 
-			type="text/javascript" 
-			data-main="${MEDIA_URL}ampcms/js/main.js" 
-			src="${MEDIA_URL}ampcms/js/libs/require.js">
-	</script>
+	<py:match path="modulejs">
+		<script type="text/javascript" src="${MEDIA_URL}${AMPCMS_JAVASCRIPT_CONFIG}" py:if="AMPCMS_JAVASCRIPT_CONFIG is not None"> </script>
+		<script type="text/javascript" 
+				data-main="${MEDIA_URL}ampcms/js/main.js" 
+				src="${MEDIA_URL}ampcms/js/libs/require.js">
+		</script>
+	</py:match>
 	
 	<div py:match="content" id="main-content-wrapper">
 		${children['page'].markup()}
