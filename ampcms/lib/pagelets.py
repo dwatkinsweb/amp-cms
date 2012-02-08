@@ -95,13 +95,13 @@ class MenuPagelet(BasePagelet):
         self._template = template
         self._children = []
     
-    def append(self, label, href):
+    def append(self, label, href, icon=None):
         '''
         Manually append a new item to the menu
         @param label: label to be display for the menu
         @param href: url for the menu item
         '''
-        self._children.append((label,href))
+        self._children.append((label,href, icon))
     
     def _get_context(self):
         context = super(MenuPagelet, self)._get_context()

@@ -41,6 +41,7 @@ class Site(DjangoSite):
 class Module(models.Model):
     name = models.CharField(max_length=30)
     title = models.CharField(max_length=30)
+    icon = models.ImageField(upload_to='images/icons/', max_length=1024, null = True, blank = True)
     order = models.IntegerField(max_length=2)
     active = models.BooleanField(default=False)
     site = models.ForeignKey(Site)
@@ -71,6 +72,7 @@ class Page(models.Model):
     # TODO: Allow for a many to many relationship between page and pagelet
     name = models.CharField(max_length=30)
     title = models.CharField(max_length=30)
+    icon = models.ImageField(upload_to='images/icons/', max_length=1024, null = True, blank = True)
     page_class = models.CharField(max_length=30, choices=[(page_name, page_name) for page_name, page in page_mapper.items])
     order = models.IntegerField()
     active = models.BooleanField(default=False)
