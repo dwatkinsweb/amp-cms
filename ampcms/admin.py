@@ -211,7 +211,7 @@ class PageletAdmin(admin.ModelAdmin):
 if settings.AMPCMS_WYSIWYG == 'ckeditor':
     from ckeditor.widgets import CKEditorWidget
     class PageletAdminForm(forms.ModelForm):
-        content = forms.CharField(widget=CKEditorWidget())
+        content = forms.CharField(widget=CKEditorWidget(), required=False)
         class Meta:
             model = Pagelet
     PageletAdmin.form = PageletAdminForm
