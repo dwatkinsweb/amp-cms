@@ -23,6 +23,7 @@ define(['ampcms/sandbox'], function(sandbox) {
 			var CONTAINER = core.dom.find('#' + pagelet_selector);
 			var pagelet = {
 				__CONTAINER : CONTAINER,
+				events : {},
 				log : function(severity, message) {
 					core.log(severity, message);
 				},

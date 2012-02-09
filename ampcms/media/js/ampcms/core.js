@@ -78,22 +78,24 @@ define(['require', 'ampcms/pagelet', 'ampcms/sandbox', 'libs/history'], function
 			},
 			// Event Handling Methods
 			events : {
-				publish : function(event) {
+				publish : function(events) {
 					for(pagelet in pagelet_data) {
 						if(pagelet_data.hasOwnProperty(pagelet)) {
 							pagelet = pagelet_data[pagelet];
-							if(pagelet.events && pagelet.events[event.type]) {
+							if(pagelet.events) {
 								for(module_event in pagelet.events) {
-									if(pagelet.hasOwnProperty(module_event)) {
-										module_event = pagelet[module_event];
-										module[event.type](event.data);
+									if(pagelet.events.hasOwnProperty(module_event)) {
+										module_event = pagelet.events[module_event];
+										if(module_event.hasOwnProperty(events.type)){
+											module_event[events.type](events.data);
+										}
 									}
 								}
 							}
 						}
 					}
 				},
-				subscribe : function(event, pagelet, module) {
+				subscribe : function(events, pagelet, module) {
 					if(core.utils.is_object(events) && pagelet) {
 						if(pagelet_data[pagelet]) {
 							pagelet = pagelet_data[pagelet];
