@@ -66,7 +66,12 @@ class PageletPage(BasePage):
         in the structure {<pagelet.name>:<pagelet>, ...}
         '''
         _pagelets = SortedDict()
-        for pagelet in self._data_model.pagelets.active():
+        from ampcms.models import Pagelet
+        if self.request.user.is_anonymous():
+            loadable_pagelets = self._data_model.pagelets.active()
+        else:
+            loadable_pagelets = Pagelet.objects.active_user_page_pagelets(self.request.user, self._data_model)
+        for pagelet in loadable_pagelets:
             pagelet_class = pagelets.pagelet_mapper.get_item(pagelet.pagelet_class)
             _pagelets[pagelet.name] = pagelet_class(request=self.request, request_kwargs=self.request_kwargs, pagelet=pagelet)
         return _pagelets
