@@ -130,10 +130,12 @@ define(['require', 'ampcms/pagelet', 'ampcms/sandbox', 'libs/history'], function
 			// History Handling
 			history : {
 				push_state : function(id, url) {
-					var new_url = '?'+id+'='+url;
-					var title = id+' : '+url;
-					var data = {};
+					var state = History.getState(),
+						new_url, title, data;
+					data = state.data;
 					data[id] = url;
+					new_url = '?'+core.build_query_string(data);
+					title = id+' : '+url
 					// TODO: Currently not implementing title changes.
 					HistoryPlugin.pushState(data, null, new_url);
 				},

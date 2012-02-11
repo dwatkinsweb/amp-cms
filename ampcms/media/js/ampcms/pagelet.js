@@ -16,11 +16,10 @@
 */
 
 define(['ampcms/sandbox'], function(sandbox) {
-	var module_data = {};
-
 	return {
 		create : function(core, pagelet_selector) {
 			var CONTAINER = core.dom.find('#' + pagelet_selector);
+			var module_data = {};
 			var pagelet = {
 				__CONTAINER : CONTAINER,
 				events : {},
@@ -140,6 +139,7 @@ define(['ampcms/sandbox'], function(sandbox) {
 				},
 				subscribe_global : function(events, module) {
 					if(module_data[module]) {
+						core.log(2, 'subscribing globally: '+pagelet_selector);
 						core.events.subscribe(events, pagelet_selector, module);
 					} else {
 						core.log(2, "Events globally subscribed by non existant module: " + module);
@@ -181,12 +181,12 @@ define(['ampcms/sandbox'], function(sandbox) {
 								}
 							}
 							thiz.start_all();
-							thiz.replace_state(response.location);
+							thiz.push_state(response.location);
 						});
 					} else {
 						this._load_html(response.html);
 						this._transform_links();
-						thiz.replace_state(response.location);
+						thiz.push_state(response.location);
 					}
 				},
 				load : function(url) {
