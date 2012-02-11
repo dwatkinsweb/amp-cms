@@ -15,6 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
 
+from ampcms.models import User
 from ampcms.utils import set_current_request
 
 import logging
