@@ -42,7 +42,6 @@ define(function() {
 					pagelet.publish_global(event);
 				},
 				subscribe_global : function(events) {
-					sandbox.log(2, events);
 					pagelet.subscribe_global(events, module_selector);
 				},
 				unsubscribe_global : function(events) {

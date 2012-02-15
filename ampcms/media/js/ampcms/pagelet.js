@@ -139,7 +139,6 @@ define(['ampcms/sandbox'], function(sandbox) {
 				},
 				subscribe_global : function(events, module) {
 					if(module_data[module]) {
-						core.log(2, 'subscribing globally: '+pagelet_selector);
 						core.events.subscribe(events, pagelet_selector, module);
 					} else {
 						core.log(2, "Events globally subscribed by non existant module: " + module);
