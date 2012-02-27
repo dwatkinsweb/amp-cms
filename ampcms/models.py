@@ -17,7 +17,7 @@
 
 from django.db import models  
 from django.db.models.signals import post_save
-from django.contrib.auth.models import User as DjangoUser, Group as DjangoGroup, UserManager as DjangoUserManager
+from django.contrib.auth.models import User as DjangoUser, Group as DjangoGroup
 from django.contrib.sites.models import Site as DjangoSite
 
 from ampcms import managers
@@ -137,9 +137,6 @@ class Group(DjangoGroup):
 class User(DjangoUser):
     acl_pages = models.ManyToManyField(Page, blank=True)
     acl_pagelets = models.ManyToManyField(Pagelet, blank=True)
-    # Sometimes python uses the default manager instead of the DjangoUserManager.
-    #  Resetting it here to make sure it uses djangos.
-    objects = DjangoUserManager()
     
     def has_acl(self, module, page):
         return self.has_perm('%s.%s' % (module.name, page.name))
