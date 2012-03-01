@@ -22,8 +22,9 @@ from ampcms import const as C
 from django.core.urlresolvers import resolve
 from django.http import HttpResponse, HttpResponseRedirect
 from django.conf import settings
-from django_genshi import RequestContext, render_to_response #@UnresolvedImport
+from django_genshi import RequestContext, render_to_response, select_template #@UnresolvedImport
 from genshi.core import Markup #@UnresolvedImport
+from genshi.template.loader import TemplateNotFound #@UnresolvedImport
 
 import logging
 log = logging.getLogger(__name__)
@@ -41,7 +42,11 @@ def account_handling(request, *args, **kwargs):
         return response
     site = Site.objects.get_by_request(request)
     if site.skin is not None:
-        base_template = '%s/%s/base.html' % (settings.AMPCMS_SKIN_FOLDER, site.skin)
+        base_template = ['%s/%s/base.html' % (settings.AMPCMS_SKIN_FOLDER, site.skin)]
+        try:
+            select_template(base_template)
+        except TemplateNotFound, e:
+            base_template = 'base.html'
     else:
         base_template = 'base.html'
     context = RequestContext(request)
