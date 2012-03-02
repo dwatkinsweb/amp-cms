@@ -30,6 +30,7 @@ from ampcms.conf import settings
 
 import json
 import urllib
+import os
 
 import logging
 log = logging.getLogger(__name__)
@@ -117,7 +118,12 @@ class MenuPagelet(BasePagelet):
         '''
         Return the css based on the menu_label
         '''
-        return ['%s.css' % self.label]
+        _css = '%s.css' % self.label
+        self._css = [_css]
+        site = self.request_kwargs['site_model']
+        if site.skin is not None and os.path.exists('%scss/%s/%s' % (settings.MEDIA_ROOT, site.skin, _css)):
+            self._css.append('%scss/%s/%s' % (settings.MEDIA_URL, site.skin, _css))
+        return self._css
 
 class SimplePagelet(BasePagelet):
     '''
