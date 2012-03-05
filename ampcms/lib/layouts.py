@@ -63,7 +63,7 @@ class BaseLayout(BaseContentType):
                                          request=self.request,
                                          request_kwargs=self.request_kwargs)}
         
-        if self.request.user.is_anonymous():
+        if not site.private:
             for module in Module.objects.active_site_modules(site):
                 menus[MenuTypes.MAIN].append(module.title, '/%s' % module.name, icon=module.icon)
             for page in Page.objects.active_module_pages(current_module):
