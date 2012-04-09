@@ -266,7 +266,7 @@ define(['ampcms/sandbox'], function(sandbox) {
 					}
 					core.dom.bind(transformed_anchors, 'click', function(event) {
 						var target, url;
-						target = core.dom.find(event.target);
+						target = core.dom.find(event.currentTarget);
 						url = core.dom.attr(target, 'href').split('#')[1];
 						thiz.push_state(url);
 						return false;
