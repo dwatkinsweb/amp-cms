@@ -181,6 +181,7 @@ define(['ampcms/sandbox'], function(sandbox) {
 							}
 							thiz.start_all();
 							thiz.push_state(response.location);
+							thiz.push_message(response.messages);
 						});
 					} else {
 						this._load_html(response.html);
@@ -222,6 +223,9 @@ define(['ampcms/sandbox'], function(sandbox) {
 					// TODO: Remove this function and replace with push_state
 					this.log(2, 'pagelet.push_url is deprecated');
 					return this.push_state(url);
+				},
+				push_message : function(message) {
+					return core.widgets.push_message(message);
 				},
 				_get_url : function() {
 					var url, data;

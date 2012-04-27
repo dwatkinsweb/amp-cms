@@ -202,6 +202,11 @@ define(['require', 'ampcms/pagelet', 'ampcms/sandbox', 'libs/history'], function
 				    return true;
 				}
 			},
+			widgets : {
+				push_message: function(message) {
+					core.log(message);
+				}
+			},
 			decode : function(s) {
 				try {
 					return decodeURIComponent(s).replace(/\r\n|\r|\n/g, "\r\n");

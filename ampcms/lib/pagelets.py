@@ -19,6 +19,7 @@ from genshi.core import Markup #@UnresolvedImport
 from django_genshi.shortcuts import render_to_stream #@UnresolvedImport
 from django.http import HttpResponseRedirect, Http404
 from django.core.urlresolvers import resolve, set_urlconf, get_resolver
+from django.contrib import messages
 
 from ampcms.lib.content_type import BaseContentType
 from ampcms.lib.content_type_mapper import ContentTypeMapper
@@ -198,7 +199,9 @@ class ApplicationPagelet(BasePagelet):
                                C.JSON_KEY_LOCATION: self.process_url,
                                C.JSON_KEY_HTML: Markup(html),
                                C.JSON_KEY_CSS: self._build_css(),
-                               C.JSON_KEY_JS: self._build_js()})
+                               C.JSON_KEY_JS: self._build_js(),
+                               C.JSON_KEY_MESSAGES : [{'message': message.message, 'level': message.level, 'tags': message.tags} for message in messages.get_messages(self.request)]
+            })
     
     def _build_content(self, process_url=None):
         '''

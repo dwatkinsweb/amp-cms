@@ -48,6 +48,7 @@ JSON_KEY_HTML = 'html'
 JSON_KEY_CSS = 'css'
 JSON_KEY_JS = 'js'
 JSON_KEY_TITLE = 'title'
+JSON_KEY_MESSAGES = 'messages'
 
 HTML_DATA_TAG_PREFIX = 'data-'
 HTML_DATA_TAG_KEY_NAME = 'name'
