@@ -53,19 +53,19 @@ urlpatterns = patterns('ampcms.views',
     url(r'^logout/?$',
         view='logout',
         name='logout'),
-    url(r'^page/(?P<%s>[a-zA-Z0-9]+)/(?P<%s>[a-zA-Z0-9]+)/?$'
+    url(r'^page/(?P<%s>[a-zA-Z0-9\-]+)/(?P<%s>[a-zA-Z0-9\-]+)/?$'
             % (C.URL_KEY_MODULE, C.URL_KEY_PAGE),
         view=C.VIEW_NAME_PAGE,
         name=C.VIEW_NAME_PAGE),
-    url(r'^pagelet/(?P<%s>[a-zA-Z0-9_]+)/(?P<%s>[a-zA-Z0-9_]+)/(?P<%s>[a-zA-Z0-9_]+)/?(?P<%s>[a-zA-Z0-9\/\-_]+)?'
+    url(r'^pagelet/(?P<%s>[a-zA-Z0-9_\-]+)/(?P<%s>[a-zA-Z0-9_\-]+)/(?P<%s>[a-zA-Z0-9_\-]+)/?(?P<%s>[a-zA-Z0-9\/\-_]+)?'
             % (C.URL_KEY_MODULE, C.URL_KEY_PAGE, C.URL_KEY_PAGELET, C.URL_KEY_PAGELET_URL),
         view=C.VIEW_NAME_PAGELET,
         name=C.VIEW_NAME_PAGELET),
-    url(r'^css/(?P<%s>[a-zA-Z0-9_]+)/(?P<%s>[a-zA-Z0-9_]+)/?$'
+    url(r'^css/(?P<%s>[a-zA-Z0-9_\-]+)/(?P<%s>[a-zA-Z0-9_\-]+)/?$'
             % (C.URL_KEY_MODULE, C.URL_KEY_PAGE),
         view=C.VIEW_NAME_CSS,
         name=C.VIEW_NAME_CSS),
-    url(r'^(?P<%s>[a-zA-Z0-9_]+)/?(?P<%s>[a-zA-Z0-9_]+)?/?$'
+    url(r'^(?P<%s>[a-zA-Z0-9_\-]+)/?(?P<%s>[a-zA-Z0-9_\-]+)?/?$'
             % (C.URL_KEY_MODULE, C.URL_KEY_PAGE),
         view=C.VIEW_NAME_FULL_PAGE,
         name=C.VIEW_NAME_FULL_PAGE),
