@@ -15,7 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
 
-from ampcms.models import Site, get_public_module_and_page, get_private_module_and_page
+from ampcms.models import AmpCmsSite, get_public_module_and_page, get_private_module_and_page
 from ampcms.lib.exceptions import PageDoesNotExist, NoPermissions
 from ampcms.lib.response import AMPCMSAjaxResponse, HttpResponseSSLRedirect, AMPCMSMedia
 from ampcms import const as C
@@ -31,7 +31,7 @@ log = logging.getLogger(__name__)
 def user_passes_test(function, login_url=settings.AMPCMS_ACCOUNT_LOGIN_URL, public_url=settings.AMPCMS_PUBLIC_URL, permission_denied_url=settings.AMPCMS_PERMISSION_DENIED_URL):
     def _decorator(view_func):
         def _wrapped_view(request, *args, **kwargs):
-            site = Site.objects.get_by_request(request)
+            site = AmpCmsSite.objects.get_by_request(request)
             module_name = kwargs.get(C.URL_KEY_MODULE)
             page_name = kwargs.get(C.URL_KEY_PAGE)
             if not site.private:
@@ -94,7 +94,7 @@ def ampcms_view(title=None, css_files=[], js_files=[], ssl_required=False):
             response = view_func(request, *args, **kwargs)
             # Only apply changes if coming from ampcms
             if hasattr(request, 'is_ampcms') and request.is_ampcms:
-                site = Site.objects.get_by_request(request)
+                site = AmpCmsSite.objects.get_by_request(request)
                 response.ampcms_media = AMPCMSMedia(site, title, css_files, js_files)
             return response
         return wraps(view_func)(wrapped_view)

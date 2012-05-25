@@ -22,7 +22,7 @@ from django.contrib import admin
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 
-from ampcms.models import Module, Page, Pagelet, PageletAttribute, User, Group, Site
+from ampcms.models import Module, Page, Pagelet, PageletAttribute, User, Group, AmpCmsSite
 from ampcms.conf import settings
 
 class SiteAdmin(DjangoSiteAdmin):
@@ -218,7 +218,7 @@ if settings.AMPCMS_WYSIWYG == 'ckeditor':
 
 admin.site.register(User, UserAdmin)
 admin.site.register(Group, GroupAdmin)
-admin.site.register(Site, SiteAdmin)
+admin.site.register(AmpCmsSite, SiteAdmin)
 admin.site.register(Module, ModuleAdmin)
 admin.site.register(Page, PageAdmin)
 admin.site.register(Pagelet, PageletAdmin)

@@ -32,11 +32,14 @@ log = logging.getLogger(__name__)
 
 application_mapper.autodiscover()
 
-class Site(DjangoSite):
+class AmpCmsSite(DjangoSite):
     private = models.BooleanField()
     skin = models.CharField(max_length=20, null=True, blank=True)
 
     objects = managers.SiteManager()
+    
+    class Meta:
+        db_table = 'ampcms_site'
 
 class Module(models.Model):
     name = models.CharField(max_length=30)
@@ -44,7 +47,7 @@ class Module(models.Model):
     icon = models.ImageField(upload_to='images/icons/', max_length=1024, null = True, blank = True)
     order = models.IntegerField(max_length=2)
     active = models.BooleanField(default=False)
-    site = models.ForeignKey(Site)
+    site = models.ForeignKey(AmpCmsSite)
 
     objects = managers.ModuleManager()
 
@@ -143,7 +146,7 @@ class User(DjangoUser):
 
 if settings.AMPCMS_CACHING:
     from caching.base import CachingMixin #@UnresolvedImport
-    Site.__bases__ += (CachingMixin,)
+    AmpCmsSite.__bases__ += (CachingMixin,)
     Module.__bases__ += (CachingMixin,)
     Page.__bases__ += (CachingMixin,)
     Pagelet.__bases__ += (CachingMixin,)

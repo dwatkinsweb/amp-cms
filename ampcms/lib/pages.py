@@ -66,8 +66,8 @@ class PageletPage(BasePage):
         in the structure {<pagelet.name>:<pagelet>, ...}
         '''
         _pagelets = SortedDict()
-        from ampcms.models import Pagelet, Site
-        site = Site.objects.get_by_request(self.request)
+        from ampcms.models import Pagelet, AmpCmsSite
+        site = AmpCmsSite.objects.get_by_request(self.request)
         if not site.private:
             loadable_pagelets = self._data_model.pagelets.active()
         else:

@@ -17,7 +17,7 @@
 
 from ampcms.lib import layouts, pages
 from ampcms.decorators import acl_required
-from ampcms.models import Site
+from ampcms.models import AmpCmsSite
 from ampcms import const as C
 from django.core.urlresolvers import resolve
 from django.http import HttpResponse, HttpResponseRedirect
@@ -40,7 +40,7 @@ def account_handling(request, *args, **kwargs):
     response = view(request, *view_args, **view_kwargs)
     if isinstance(response, HttpResponseRedirect):
         return response
-    site = Site.objects.get_by_request(request)
+    site = AmpCmsSite.objects.get_by_request(request)
     if site.skin is not None:
         base_template = ['%s/%s/base.html' % (settings.AMPCMS_SKIN_FOLDER, site.skin)]
         try:
