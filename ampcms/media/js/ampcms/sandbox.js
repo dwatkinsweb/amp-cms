@@ -60,8 +60,12 @@ define(function() {
 				redirect : function(url) {
 					pagelet.redirect(url);
 				},
-				transform_links : function() {
-					pagelet._transform_links(CONTAINER);
+				transform_links : function(container, callback) {
+					if (typeof container === 'undefined') {
+						callback = null;
+						container = CONTAINER;
+					}
+					pagelet._transform_links(container, callback);
 				}
 			};
 			sandbox = pagelet.extend(sandbox, this.extension.create(pagelet, CONTAINER));

@@ -250,7 +250,7 @@ define(['ampcms/sandbox'], function(sandbox) {
 					core.dom.replace(CONTAINER, html);
 					CONTAINER = this.__CONTAINER = core.dom.find('#' + pagelet_selector);
 				},
-				_transform_links : function(container_element) {
+				_transform_links : function(container_element, callback) {
 					if (typeof container_element === 'undefined') {
 						container_element = CONTAINER;
 					}
@@ -268,13 +268,16 @@ define(['ampcms/sandbox'], function(sandbox) {
 							transformed_anchors.push(anchor);
 						}
 					}
-					core.dom.bind(transformed_anchors, 'click', function(event) {
-						var target, url;
-						target = core.dom.find(event.currentTarget);
-						url = core.dom.attr(target, 'href').split('#')[1];
-						thiz.push_state(url);
-						return false;
-					});
+					if (typeof callback === 'undefined' || callback === null) {
+						callback = function(event) {
+							var target, url;
+							target = core.dom.find(event.currentTarget);
+							url = core.dom.attr(target, 'href').split('#')[1];
+							thiz.push_state(url);
+							return false;
+						};
+					}
+					core.dom.bind(transformed_anchors, 'click', callback);
 				},
 				// Other Functions
 				extend : function(target, source) {
