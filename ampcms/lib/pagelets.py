@@ -227,6 +227,9 @@ class ApplicationPagelet(BasePagelet):
                 redirect_url = 'https://%s%s?%s' % (self.request.get_host(), self._data_model.page.get_absolute_url(), pagelet_params)
                 return HttpResponseFullRedirect(redirect_url)
             if isinstance(response, AMPCMSAjaxResponse) or isinstance(response, HttpResponseFullRedirect) or isinstance(response, HttpFixedResponse):
+                if isinstance(response, AMPCMSAjaxResponse) and isinstance(response.response, HttpResponseRedirect):
+                    log.debug('Redirecting ajax to %s' % response.response['location'])
+                    response.response['location'] = '%s%s' % (self._data_model.get_absolute_url(), response.response['location'])
                 # These responses return as is
                 return response
             elif isinstance(response, HttpResponseRedirect):
