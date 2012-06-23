@@ -41,7 +41,7 @@ def user_passes_test(function, login_url=settings.AMPCMS_ACCOUNT_LOGIN_URL, publ
                     # Redirect to the public home page
                     return HttpResponseRedirect(public_url)
                 else:
-                    log.info('Successfully loaded module and page: User %s viewing page %s.%s' 
+                    log.debug('Successfully loaded module and page: User %s viewing page %s.%s' 
                               % (request.user.username, module.name, page.name))
             elif request.user.is_authenticated():
                 # Attempt to load module and page
@@ -52,7 +52,7 @@ def user_passes_test(function, login_url=settings.AMPCMS_ACCOUNT_LOGIN_URL, publ
                 except NoPermissions:
                     return HttpResponseRedirect(settings.AMPCMS_ACCOUNT_NO_PERMISSIONS_URL)
                 else:
-                    log.info('Successfully loaded module and page: User %s viewing page %s.%s' 
+                    log.debug('Successfully loaded module and page: User %s viewing page %s.%s' 
                               % (request.user.username, module.name, page.name))
             else:
                 return HttpResponseRedirect('%s?next=%s' % (login_url, urlquote(request.get_full_path())))
