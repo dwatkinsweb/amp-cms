@@ -223,7 +223,7 @@ def get_private_module_and_page(site, module_name, page_name, user):
     
     return (module, page)
 
-def create_user_profile(sender, instance, created, **kwargs):
+def create_ampcms_user(sender, instance, created, **kwargs):
     if created:
         user, user_created = User.objects.get_or_create(pk=instance.id,
                                                         defaults={'username':instance.username,
@@ -236,4 +236,10 @@ def create_user_profile(sender, instance, created, **kwargs):
                                                                   'is_superuser':instance.is_superuser,
                                                                   'last_login':instance.last_login,
                                                                   'date_joined':instance.date_joined})
-post_save.connect(create_user_profile, sender=DjangoUser)
+def create_ampcms_site(sender, instance, created, **kwargs):
+    if created:
+        site, site_created = AmpCmsSite.objects.get_or_create(pk=instance.id,
+                                                              defaults={'domain':instance.domain,
+                                                                        'name':instance.name})
+post_save.connect(create_ampcms_user, sender=DjangoUser)
+post_save.connect(create_ampcms_site, sender=DjangoSite)
