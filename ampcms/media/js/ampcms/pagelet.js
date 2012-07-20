@@ -187,6 +187,7 @@ define(['ampcms/sandbox'], function(sandbox) {
 						this._load_html(response.html);
 						this._transform_links();
 						thiz.push_state(response.location);
+						thiz.push_message(response.messages);
 					}
 				},
 				load : function(url) {

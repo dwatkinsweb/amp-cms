@@ -17,7 +17,7 @@
 
 from genshi.core import Markup #@UnresolvedImport
 from django_genshi.shortcuts import render_to_stream #@UnresolvedImport
-from django.http import HttpResponseRedirect, Http404
+from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.core.urlresolvers import resolve, set_urlconf, get_resolver
 from django.contrib import messages
 
@@ -54,6 +54,7 @@ class BasePagelet(BaseContentType):
         self._template = template
         self.view_css = []
         self.view_js = []
+        self.response = None
     
     def _get_html_data(self):
         if self._data_model is not None:
@@ -182,26 +183,29 @@ class ApplicationPagelet(BasePagelet):
             self.process_url = process_url
         application_content = self._build_content()
         if isinstance(application_content, AMPCMSAjaxResponse):
-            return application_content.response
+            response = application_content.response
         elif isinstance(application_content, HttpResponseFullRedirect):
-            return json.dumps({C.JSON_KEY_REDIRECT: True,
+            response = HttpResponse(json.dumps({C.JSON_KEY_REDIRECT: True,
                                C.JSON_KEY_NAME: self._data_model.name,
                                C.JSON_KEY_LOCATION: application_content['location'],
                                C.JSON_KEY_HTML: '',
                                C.JSON_KEY_CSS: self._build_css(),
-                               C.JSON_KEY_JS: self._build_js()})
+                               C.JSON_KEY_JS: self._build_js()}))
         elif isinstance(application_content, HttpResponseRedirect) or isinstance(application_content, HttpFixedResponse):
-            return application_content
+            response = application_content
         else:
             html = self.html(include_content=application_content)
-            return json.dumps({C.JSON_KEY_REDIRECT: False,
+            response = HttpResponse(json.dumps({C.JSON_KEY_REDIRECT: False,
                                C.JSON_KEY_NAME: self._data_model.name,
                                C.JSON_KEY_LOCATION: self.process_url,
                                C.JSON_KEY_HTML: Markup(html),
                                C.JSON_KEY_CSS: self._build_css(),
                                C.JSON_KEY_JS: self._build_js(),
                                C.JSON_KEY_MESSAGES : [{'message': message.message, 'level': message.level, 'tags': message.tags} for message in messages.get_messages(self.request)]
-            })
+            }))
+        if self.response is not None and len(self.response.cookies) > 0:
+            response.cookies = self.response.cookies
+        return response
     
     def _build_content(self, process_url=None):
         '''
@@ -222,6 +226,7 @@ class ApplicationPagelet(BasePagelet):
             view, args, kwargs = resolve(self.process_url)
             self.request.is_ampcms = True
             response = view(self.request, *args, **kwargs)
+            self.response = response
             if isinstance(response, HttpResponseSSLRedirect):
                 pagelet_params = urllib.urlencode({'%s-pagelet' % self._data_model.name: self.process_url})
                 redirect_url = 'https://%s%s?%s' % (self.request.get_host(), self._data_model.page.get_absolute_url(), pagelet_params)
@@ -269,6 +274,20 @@ class ApplicationPagelet(BasePagelet):
                      C.HTML_DATA_TAG_KEY_APPLICATION : self._data_model.application})
         return data
 
+class IFramePagelet(BasePagelet):
+    '''
+    Simple container that displays a small bit of html output
+    '''
+    def __init__(self, template='pagelets/iframe.html', **kwargs):
+        super(IFramePagelet, self).__init__(**kwargs)
+        self._template = template
+
+    def _get_context(self):
+        context = super(IFramePagelet, self)._get_context()
+        context['content'] = Markup("<iframe style='height: 100%; width: 100%; border: none;' src='"+self._data_model.starting_url+"'> </iframe>")
+        return context
+    
 pagelet_mapper = ContentTypeMapper(BasePagelet)
 pagelet_mapper.register('SimplePagelet', SimplePagelet)
 pagelet_mapper.register('ApplicationPagelet', ApplicationPagelet)
+pagelet_mapper.register('IFrame', IFramePagelet)
