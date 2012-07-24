@@ -236,10 +236,16 @@ def create_ampcms_user(sender, instance, created, **kwargs):
                                                                   'is_superuser':instance.is_superuser,
                                                                   'last_login':instance.last_login,
                                                                   'date_joined':instance.date_joined})
+        
+def create_ampcms_group(sender, instance, created, **kwargs):
+    if created:
+        group, group_created = Group.objects.get_or_create(pk=instance.id)
+
 def create_ampcms_site(sender, instance, created, **kwargs):
     if created:
         site, site_created = AmpCmsSite.objects.get_or_create(pk=instance.id,
                                                               defaults={'domain':instance.domain,
                                                                         'name':instance.name})
 post_save.connect(create_ampcms_user, sender=DjangoUser)
+post_save.connect(create_ampcms_group, sender=DjangoGroup)
 post_save.connect(create_ampcms_site, sender=DjangoSite)
