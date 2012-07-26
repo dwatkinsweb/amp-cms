@@ -59,6 +59,9 @@ class ModuleManager(Manager):
         if settings.AMPCMS_CACHING:
             modules.cache(timeout=settings.AMPCMS_CACHING_TIMEOUT)
         return modules
+    
+    def get_by_natural_key(self, name, site_name, site_domain):
+        return self.get(name=name, site__name=site_name, site__domain=site_domain)
 
 class PageManager(Manager):
     use_for_related_fields = True
@@ -91,6 +94,9 @@ class PageManager(Manager):
         if settings.AMPCMS_CACHING:
             pages.cache(timeout=settings.AMPCMS_CACHING_TIMEOUT)
         return pages
+    
+    def get_by_natural_key(self, name, module_name, site_name, site_domain):
+        return self.get(name=name, module__name=module_name, module__site__name=site_name, module__site__domain=site_domain)
 
 class PageletManager(Manager):
     use_for_related_fields = True
@@ -109,6 +115,9 @@ class PageletManager(Manager):
         if settings.AMPCMS_CACHING:
             user_page_pagelets.cache(timeout=settings.AMPCMS_CACHING_TIMEOUT)
         return user_page_pagelets
+    
+    def get_by_natural_key(self, name, page_name, module_name, site_name, site_domain):
+        return self.get(name=name, page__name=page_name, page__module__name=module_name, page__module__site__name=site_name, page__module__site__domain=site_domain)
 
 class SiteManager(DjangoSiteManager):
     def get_by_request(self, request):
@@ -119,6 +128,9 @@ class SiteManager(DjangoSiteManager):
         if settings.AMPCMS_CACHING:
             current_site.cache(timeout=settings.AMPCMS_CACHING_TIMEOUT)
         return current_site[0]
+    
+    def get_by_natural_key(self, name, domain):
+        return self.get(name=name, domain=domain)
 
 if settings.AMPCMS_CACHING:
     from caching.base import CachingManager #@UnresolvedImport

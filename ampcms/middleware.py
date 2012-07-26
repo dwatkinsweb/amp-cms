@@ -25,7 +25,17 @@ class UserManagement:
     ''' This is used to replace the default request.user object with our extended user object '''
     def process_request(self, request):
         if request.user.is_authenticated():
-            request.user, created = User.objects.get_or_create(pk=request.user.pk)
+            request.user, created = User.objects.get_or_create(pk=request.user.pk,
+                                                               defaults={'username':request.user.username,
+                                                                         'first_name':request.user.first_name,
+                                                                         'last_name':request.user.last_name,
+                                                                         'email':request.user.email,
+                                                                         'password':request.user.password,
+                                                                         'is_staff':request.user.is_staff,
+                                                                         'is_active':request.user.is_active,
+                                                                         'is_superuser':request.user.is_superuser,
+                                                                         'last_login':request.user.last_login,
+                                                                         'date_joined':request.user.date_joined})
 
 class RequestThreadStorage:
     def process_request(self, request):

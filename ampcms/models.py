@@ -40,6 +40,9 @@ class AmpCmsSite(DjangoSite):
     
     class Meta:
         db_table = 'ampcms_site'
+    
+    def natural_key(self):
+        return (self.name, self.domain)
 
 class Module(models.Model):
     name = models.CharField(max_length=30)
@@ -63,12 +66,16 @@ class Module(models.Model):
     @property
     def active_pages(self):
         return self.pages.filter(active=True)
+
+    def natural_key(self):
+        return (self.name,) + self.site.natural_key()
+    natural_key.dependencies = ['ampcms.ampcmssite']
     
     def __unicode__(self):
         return '%s/%s' % (self.site, self.name)
     
     class Meta:
-        unique_together=(('name','site'),('site', 'order'))
+        unique_together = (('name','site'),('site', 'order'))
         ordering = ['site', 'order']
 
 class Page(models.Model):
@@ -87,6 +94,10 @@ class Page(models.Model):
     
     def get_absolute_url(self):
         return '/%s/%s' % (self.module.name, self.name)
+
+    def natural_key(self):
+        return (self.name,) + self.module.natural_key()
+    natural_key.dependencies = ['ampcms.module']
     
     def __unicode__(self):
         return '%s/%s' % (self.module, self.name)
@@ -112,6 +123,10 @@ class Pagelet(models.Model):
     
     def get_absolute_url(self):
         return '/pagelet/%s/%s/%s' % (self.page.module.name, self.page.name, self.name)
+
+    def natural_key(self):
+        return (self.name,) + self.page.natural_key()
+    natural_key.dependencies = ['ampcms.page']
     
     def __unicode__(self):
         return '%s/%s' % (self.page, self.name)
@@ -136,6 +151,12 @@ class PageletAttribute(models.Model):
 class Group(DjangoGroup):
     acl_pages = models.ManyToManyField(Page, blank=True)
     acl_pagelets = models.ManyToManyField(Pagelet, blank=True)
+    
+    def get_by_natural_key(self, name):
+        return self.get(name=name)
+
+    def natural_key(self):
+        return (self.name,)
 
 class User(DjangoUser):
     acl_pages = models.ManyToManyField(Page, blank=True)
