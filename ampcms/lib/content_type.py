@@ -69,9 +69,10 @@ class BaseContentType(object):
                 if settings.MEDIA_URL in _css or 'HTTP://' in _css:
                     self._css.append('@import url("%s");' % _css)
                 else:
-                    self._css.append('@import url("%scss/%s");' % (settings.MEDIA_URL, _css))
                     if site.skin is not None and os.path.exists('%scss/%s/%s' % (settings.MEDIA_ROOT, site.skin, _css)):
                         self._css.append('@import url("%scss/%s/%s");' % (settings.MEDIA_URL, site.skin, _css))
+                    else:
+                        self._css.append('@import url("%scss/%s");' % (settings.MEDIA_URL, _css))
             self._css = '\n'.join(self._css)
         return self._css
     
@@ -108,9 +109,18 @@ class BaseContentType(object):
         site = self.request_kwargs['site_model']
         if self._template is None:
             raise ImproperlyConfigured('No template defined for object %s' % type(self))
-        template_list = ['ampcms/%s' % self._template]
+        if isinstance(self._template, list):
+            template_list = ['ampcms/%s' % _t for _t in self._template]
+        else:
+            template_list = ['ampcms/%s' % self._template]
         if site.skin is not None:
-            template_list.insert(0, '%s/%s/%s' % (settings.AMPCMS_SKIN_FOLDER, site.skin, self._template))
+            if isinstance(self._template, list):
+                skin_template_list = ['%s/%s/%s' % (settings.AMPCMS_SKIN_FOLDER, site.skin, _t) for _t in self._template]
+            else:
+                skin_template_list = ['%s/%s/%s' % (settings.AMPCMS_SKIN_FOLDER, site.skin, self._template)]
+        else:
+            skin_template_list = []
+        template_list = skin_template_list + template_list
         return template_list
     
     def _get_context(self):

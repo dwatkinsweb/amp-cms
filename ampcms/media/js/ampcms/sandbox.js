@@ -28,6 +28,9 @@ define(function() {
 				push_url : function(url) {
 					pagelet.load(url);
 				},
+				refresh_pagelet : function() {
+					pagelet.load(null, true);
+				},
 				push_message : function(message) {
 					return pagelet.push_message(message);
 				},

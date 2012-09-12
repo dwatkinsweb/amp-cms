@@ -190,7 +190,7 @@ define(['ampcms/sandbox'], function(sandbox) {
 						thiz.push_message(response.messages);
 					}
 				},
-				load : function(url) {
+				load : function(url, force_refresh) {
 					var data, thiz = this, new_url;
 					if(url == null) {
 						url = this._get_url();
@@ -200,7 +200,7 @@ define(['ampcms/sandbox'], function(sandbox) {
 						core.log('loading url: ' + url);
 						new_url = this._build_url(url);
 						data = core.dom.data(CONTAINER);
-						if(new_url != null && url !== data.location) {
+						if(new_url != null && (url !== data.location || force_refresh)) {
 							core.dom.trigger(CONTAINER, 'ampcms.pagelet.loadstart');
 							core.ajax.get(new_url, function(response) {
 								core.dom.trigger(CONTAINER, 'ampcms.pagelet.loadajaxcomplete');

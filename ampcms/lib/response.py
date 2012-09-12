@@ -17,6 +17,7 @@
 
 from django.http import HttpResponseRedirect, HttpResponse
 from django.conf import settings
+from django_genshi.shortcuts import render_to_response as django_render_to_response
 
 import os
 
@@ -32,7 +33,7 @@ class AMPCMSMedia(object):
         self.title = title
         self.site = site
         self._css = css
-        self.js = js
+        self._js = js
     
     @property
     def css(self):
@@ -46,9 +47,33 @@ class AMPCMSMedia(object):
                 css = '%scss/%s' % (settings.MEDIA_URL, css)
             css_files.append(css)
         return css_files
+    
+    @property
+    def js(self):
+        js_files = []
+        for js in self._js:
+            if 'HTTP://' in js or settings.MEDIA_URL in js:
+                pass
+            elif self.site.skin is not None and os.path.exists('%sjs/%s/%s' % (settings.MEDIA_ROOT, self.site.skin, js)):
+                js = '%s/%s' % (self.site.skin, js)
+            js_files.append(js)
+        return js_files
 
 class HttpResponseFullRedirect(HttpResponseRedirect):
     pass
 
 class HttpFixedResponse(HttpResponse):
     pass
+
+def render_to_response(template_name, dictionary=None, context_instance=None):
+    request = dictionary.get('request')
+    if request is not None:
+        from ampcms.models import AmpCmsSite
+        site = AmpCmsSite.objects.get_by_request(request)
+        if site.skin is not None:
+            skin_template = '%s/%s' % (site.skin, template_name)
+            if not isinstance(template_name, list):
+                template_name = [template_name]
+            template_name.insert(0, skin_template)
+    return django_render_to_response(template_name, dictionary, context_instance)
+    
