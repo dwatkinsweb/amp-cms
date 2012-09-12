@@ -75,5 +75,9 @@ class BaseLayout(BaseContentType):
                 menus[MenuTypes.SIDE].append(page.title, '/%s/%s' % (current_module.name, page.name), icon=page.icon)
         return menus
 
+    def index_html(self):
+        self._template = ['layout_index.html', self._template]
+        return self.html()
+
 class PCLayout(BaseLayout):
     pass
