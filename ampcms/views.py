@@ -71,7 +71,7 @@ def index(request, *args, **kwargs):
     page_content = pages.page_mapper.get_item(page.page_class)(request=request, request_kwargs=kwargs, page=page)
     layout = layouts.PCLayout(request=request, request_kwargs=kwargs, page=page_content)
     log.debug('ampcms.views.index - end')
-    return HttpResponse(layout.html())
+    return HttpResponse(layout.index_html())
 
 @acl_required()
 def full_page(request, *args, **kwargs):
