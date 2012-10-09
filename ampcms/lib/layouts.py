@@ -22,6 +22,7 @@ from ampcms.lib.pagelets import MenuPagelet
 class MenuTypes:
     MAIN = 'menu-main'
     SIDE = 'menu-side'
+    FULL = 'menu-full'
 
 class BaseLayout(BaseContentType):
     '''
@@ -56,6 +57,7 @@ class BaseLayout(BaseContentType):
         menus = {
             MenuTypes.MAIN : MenuPagelet(label=MenuTypes.MAIN,
                                          selected_item=current_module.title,
+                                         selected_sub_item=current_page.title,
                                          request=self.request,
                                          request_kwargs=self.request_kwargs),
             MenuTypes.SIDE : MenuPagelet(label=MenuTypes.SIDE,
@@ -66,11 +68,15 @@ class BaseLayout(BaseContentType):
         if not site.private:
             for module in Module.objects.active_site_modules(site):
                 menus[MenuTypes.MAIN].append(module.title, '/%s' % module.name, icon=module.icon)
+                for page in Page.objects.active_module_pages(module):
+                    menus[MenuTypes.MAIN].append_sub_item(module.title, page.title, '/%s/%s' % (module.name, page.name), icon=page.icon)
             for page in Page.objects.active_module_pages(current_module):
                 menus[MenuTypes.SIDE].append(page.title, '/%s/%s' % (current_module.name, page.name), icon=page.icon)
         else:
             for module in Module.objects.active_user_site_modules(self.request.user, site):
                 menus[MenuTypes.MAIN].append(module.title, '/%s' % module.name, icon=module.icon)
+                for page in Page.objects.active_module_pages(module):
+                    menus[MenuTypes.FULL].append_sub_item(module.title, page.title, '/%s/%s' % (current_module.name, page.name), icon=page.icon)
             for page in Page.objects.active_user_module_pages(self.request.user, current_module):
                 menus[MenuTypes.SIDE].append(page.title, '/%s/%s' % (current_module.name, page.name), icon=page.icon)
         return menus

@@ -85,7 +85,7 @@ class MenuPagelet(BasePagelet):
     '''
     Pagelet used to build a menu. This is not a pagelet that 
     '''
-    def __init__(self, label=None, selected_item=None, template='pagelets/menu.html', **kwargs):
+    def __init__(self, label=None, selected_item=None, selected_sub_item=None, template='pagelets/menu.html', **kwargs):
         '''
         Initialize the menu. Default this pagelet to None because the pagelet may not be created from the database.
         @param menu_label: label of the menu used as the <ul> class and id
@@ -95,8 +95,10 @@ class MenuPagelet(BasePagelet):
         super(MenuPagelet, self).__init__(**kwargs)
         self.label = label
         self.selected_item = selected_item
+        self.selected_sub_item = selected_sub_item
         self._template = template
         self._children = []
+        self._sub_children = {}
     
     def append(self, label, href, icon=None):
         '''
@@ -106,10 +108,17 @@ class MenuPagelet(BasePagelet):
         '''
         self._children.append((label,href, icon))
     
+    def append_sub_item(self, parent_label, label, href, icon=None):
+        if parent_label not in self._sub_children:
+            self._sub_children[parent_label] = []
+        self._sub_children[parent_label].append((label,href,icon))
+    
     def _get_context(self):
         context = super(MenuPagelet, self)._get_context()
         context.update({C.CONTENT_TYPE_CONTEXT_MENU_LABEL: self.label,
-                        C.CONTENT_TYPE_CONTEXT_SELECTED_ITEM : self.selected_item})
+                        C.CONTENT_TYPE_CONTEXT_SELECTED_ITEM : self.selected_item,
+                        'sub_children' : self._sub_children,
+                        'selected_sub_item' : self.selected_sub_item})
         return context
     
     def _get_html_data(self):
