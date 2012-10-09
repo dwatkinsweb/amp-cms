@@ -63,6 +63,9 @@ class Module(models.Model):
                 self.order = 1
         return super(Module, self).save(*args, **kwargs)
     
+    def get_absolute_url(self):
+        return '/%s' % self.name
+    
     @property
     def active_pages(self):
         return self.pages.filter(active=True)
@@ -185,7 +188,7 @@ def get_public_module_and_page(site, module_name, page_name):
     try:
         if module_name is None:
             try:
-                page = Page.objects.filter(module__site=site)[0]
+                page = Page.objects.active().filter(module__site=site)[0]
             except IndexError, e:
                 message = 'Site %s has no pages' % site
                 log.warning(message)
