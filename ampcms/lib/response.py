@@ -67,9 +67,11 @@ def render_to_response(template_name, dictionary=None, context_instance=None):
             from ampcms.models import AmpCmsSite
             site = AmpCmsSite.objects.get_by_request(request)
             if site.skin is not None:
-                skin_template = '%s/%s' % (site.skin, template_name)
                 if not isinstance(template_name, list):
-                    template_name = [template_name]
-                template_name.insert(0, skin_template)
-    return django_render_to_response(template_name, dictionary, context_instance)
+                    new_template_name = [template_name]
+                else:
+                    new_template_name = template_name
+                new_template_name.insert(0, '%s/%s' % (site.skin, template_name))
+                new_template_name.insert(0, '%s/%s/%s' % (settings.AMPCMS_SKIN_FOLDER, site.skin, template_name))
+    return django_render_to_response(new_template_name, dictionary, context_instance)
     

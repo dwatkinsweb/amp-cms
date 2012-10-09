@@ -16,13 +16,14 @@
 #-------------------------------------------------------------------------------
 
 from ampcms.lib import layouts, pages
+from ampcms.lib.response import render_to_response
 from ampcms.decorators import acl_required
-from ampcms.models import AmpCmsSite
+from ampcms.models import AmpCmsSite, get_public_module_and_page
 from ampcms import const as C
 from django.core.urlresolvers import resolve
 from django.http import HttpResponse, HttpResponseRedirect
 from django.conf import settings
-from django_genshi import RequestContext, render_to_response, select_template #@UnresolvedImport
+from django_genshi import RequestContext, select_template #@UnresolvedImport
 from genshi.core import Markup #@UnresolvedImport
 from genshi.template.loader import TemplateNotFound #@UnresolvedImport
 
@@ -49,7 +50,14 @@ def account_handling(request, *args, **kwargs):
             base_template = 'base.html'
     else:
         base_template = 'base.html'
+        
+    module, page = get_public_module_and_page(site, None, None)
+    kwargs['site_model'] = site
+    page_content = pages.page_mapper.get_item(page.page_class)(request=request, request_kwargs=kwargs, page=page)
+    layout = layouts.PCLayout(request=request, request_kwargs=kwargs, page=page_content)
     context = RequestContext(request)
+    context['menus'] = layout.children()
+    context['page'] = page_content
     context['content'] = Markup(response.content)
     context['base'] = base_template
     if hasattr(response, 'ampcms_media'):
