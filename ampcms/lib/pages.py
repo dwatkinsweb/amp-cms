@@ -46,6 +46,12 @@ class BasePage(BaseContentType):
         '''
         return self._data_model.get_absolute_url()
 
+    def breadcrumbs(self):
+        breadcrumbs = pagelets.BreadCrumbPaglet(request=self.request, request_kwargs=self.request_kwargs)
+        breadcrumbs.append(self._data_model.module.title, self._data_model.module.get_absolute_url())
+        breadcrumbs.append(self._data_model.title, self._data_model.get_absolute_url())
+        return breadcrumbs.markup()
+        
 class PageletPage(BasePage):
     def get_pagelet(self, pagelet=None):
         '''

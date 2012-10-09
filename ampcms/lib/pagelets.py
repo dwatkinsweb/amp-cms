@@ -292,6 +292,20 @@ class IFramePagelet(BasePagelet):
         context = super(IFramePagelet, self)._get_context()
         context['content'] = Markup("<iframe style='height: 100%; width: 100%; border: none;' src='"+self._data_model.starting_url+"'> </iframe>")
         return context
+
+class BreadCrumbPaglet(BasePagelet):
+    def __init__(self, template='pagelets/breadcrumbs.html', **kwargs):
+        super(BasePagelet, self).__init__(**kwargs)
+        self._template = template
+        self._breadcrumbs = []
+    
+    def append(self, label, url):
+        self._breadcrumbs.append((label, url))
+
+    def _get_context(self):
+        context = super(BasePagelet, self)._get_context()
+        context['breadcrumbs'] = self._breadcrumbs
+        return context
     
 pagelet_mapper = ContentTypeMapper(BasePagelet)
 pagelet_mapper.register('SimplePagelet', SimplePagelet)

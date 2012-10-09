@@ -1,0 +1,5 @@
+<div id="breadcrumb-container">
+	<ul xmlns:py="http://genshi.edgewall.org/" class="breadcrumbs">
+		<li py:for="i, (label, href) in enumerate(breadcrumbs)">${' >> ' if i is not 0 else ''}<a href="${href}"><span>${label}</span></a></li>
+	</ul>
+</div>
