@@ -51,12 +51,17 @@ def account_handling(request, *args, **kwargs):
     else:
         base_template = 'base.html'
         
-    module, page = get_public_module_and_page(site, None, None)
-    kwargs['site_model'] = site
-    page_content = pages.page_mapper.get_item(page.page_class)(request=request, request_kwargs=kwargs, page=page)
-    layout = layouts.PCLayout(request=request, request_kwargs=kwargs, page=page_content)
+    if not site.private:
+        module, page = get_public_module_and_page(site, None, None)
+        kwargs['site_model'] = site
+        page_content = pages.page_mapper.get_item(page.page_class)(request=request, request_kwargs=kwargs, page=page)
+        layout = layouts.PCLayout(request=request, request_kwargs=kwargs, page=page_content)
+        menus = layout.children()
+    else:
+        page_content = None
+        menus = None
     context = RequestContext(request)
-    context['menus'] = layout.children()
+    context['menus'] = menus
     context['page'] = page_content
     context['content'] = Markup(response.content)
     context['base'] = base_template
