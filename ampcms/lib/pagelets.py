@@ -231,6 +231,10 @@ class ApplicationPagelet(BasePagelet):
             set_urlconf(application.urlconf)
             view, args, kwargs = resolve(self.process_url)
             self.request.is_ampcms = True
+            self.request.ampcms_module = self.request_kwargs.get(C.URL_KEY_MODULE)
+            self.request.ampcms_page = self.request_kwargs.get(C.URL_KEY_PAGE)
+            self.request.ampcms_pagelet = self.request_kwargs.get(C.URL_KEY_PAGELET)
+            self.request.ampcms_pagelet_path = self.process_url
             response = view(self.request, *args, **kwargs)
             self.response = response
             if isinstance(response, HttpResponseSSLRedirect):
