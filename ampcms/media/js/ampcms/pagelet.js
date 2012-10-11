@@ -61,7 +61,7 @@ define(['ampcms/sandbox'], function(sandbox) {
 				start : function(module_id) {
 					core.log('starting module ' + module_id);
 					var mod = module_data[module_id], mod_sandbox;
-					if(mod) {
+					if(mod && core.dom.find('#'+module_id).length > 0) {
 						mod_sandbox = sandbox.create(this, module_id);
 						mod.instance = mod.create(mod_sandbox);
 						mod.instance.init();
