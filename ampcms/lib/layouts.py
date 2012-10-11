@@ -75,7 +75,7 @@ class BaseLayout(BaseContentType):
             for module in Module.objects.active_user_site_modules(self.request.user, site):
                 menus[MenuTypes.MAIN].append(module.title, '/%s' % module.name, icon=module.icon)
                 for page in Page.objects.active_user_module_pages(self.request.user, module):
-                    menus[MenuTypes.MAIN].append_sub_item(module.title, page.title, '/%s/%s' % (current_module.name, page.name), icon=page.icon)
+                    menus[MenuTypes.MAIN].append_sub_item(module.title, page.title, '/%s/%s' % (module.name, page.name), icon=page.icon)
             for page in Page.objects.active_user_module_pages(self.request.user, current_module):
                 menus[MenuTypes.SIDE].append(page.title, '/%s/%s' % (current_module.name, page.name), icon=page.icon)
         return menus
