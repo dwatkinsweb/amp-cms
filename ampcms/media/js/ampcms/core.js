@@ -60,18 +60,24 @@ define(['require', 'ampcms/pagelet', 'ampcms/sandbox', 'libs/history'], function
 				require(js, callback);
 			},
 			load_page : function(module, page, pagelets) {
-				var _key, pagelet_data = [];
-				// TODO: Change this to use core.build_query_string
-				for (_key in pagelets) {
-					if (pagelets.hasOwnProperty(_key)) {
-						pagelet_data.push(_key+'-pagelet='+pagelets[_key]);
+				var url;
+				if (typeof page === 'undefined') {
+					url = module;
+				} else {
+					var _key, pagelet_data = [];
+					// TODO: Change this to use core.build_query_string
+					for (_key in pagelets) {
+						if (pagelets.hasOwnProperty(_key)) {
+							pagelet_data.push(_key+'-pagelet='+pagelets[_key]);
+						}
 					}
+					query_string = '?'+pagelet_data.join('&');
+					if (!core.supports.history) {
+						query_string = '#'+query_string;
+					}
+					url = '/'+module+'/'+page+query_string
 				}
-				query_string = '?'+pagelet_data.join('&');
-				if (!core.supports.history) {
-					query_string = '#'+query_string;
-				}
-				this.redirect('/'+module+'/'+page+query_string);
+				this.redirect(url);
 			},
 			redirect : function(url) {
 				location.href = url;
