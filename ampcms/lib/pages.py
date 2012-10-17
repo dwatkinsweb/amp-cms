@@ -16,6 +16,7 @@
 #-------------------------------------------------------------------------------
 
 from django.utils.datastructures import SortedDict
+from django.db.models import Q
 
 from ampcms.lib.content_type import BaseContentType
 from ampcms.lib.content_type_mapper import ContentTypeMapper
@@ -76,6 +77,10 @@ class PageletPage(BasePage):
         site = AmpCmsSite.objects.get_by_request(self.request)
         if not site.private:
             loadable_pagelets = self._data_model.pagelets.active()
+            if self.request.user.is_anonymous():
+                loadable_pagelets = loadable_pagelets.filter(private=False)
+            else:
+                loadable_pagelets = loadable_pagelets.filter(Q(private=False) | Q(user=self.request.user) | Q(group__user=self.request.user))
         else:
             loadable_pagelets = Pagelet.objects.active_user_page_pagelets(self.request.user, self._data_model)
         for pagelet in loadable_pagelets:

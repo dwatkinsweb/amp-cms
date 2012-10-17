@@ -38,13 +38,15 @@ def user_has_acl(function, login_url=settings.AMPCMS_ACCOUNT_LOGIN_URL, public_u
             page_name = kwargs.get(C.URL_KEY_PAGE)
             if not site.private:
                 try:
-                    module, page = get_public_module_and_page(site, module_name, page_name)
+                    module, page = get_public_module_and_page(site, module_name, page_name, request.user)
                 except:
                     # Redirect to the public home page
                     return HttpResponseRedirect(public_url)
                 else:
                     log.debug('Successfully loaded module and page: User %s viewing page %s.%s' 
                               % (request.user.username, module.name, page.name))
+                if page.private and not request.user.is_authenticated():
+                    return HttpResponseRedirect('%s?%s=%s' % (login_url, REDIRECT_FIELD_NAME, urlquote(request.get_full_path())))
             elif request.user.is_authenticated():
                 # Attempt to load module and page
                 try:

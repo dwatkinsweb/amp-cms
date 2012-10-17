@@ -80,8 +80,10 @@ class PageManager(Manager):
             pages.cache(timeout=settings.AMPCMS_CACHING_TIMEOUT)
         return pages
 
-    def active_module_pages(self, module):
+    def active_module_pages(self, user, module):
         pages = self.active().filter(module=module)
+        if user.is_authenticated():
+            pages = pages.filter(Q(private=False) | Q(user=user) | Q(group__user=user))
         if settings.AMPCMS_CACHING:
             pages.cache(timeout=settings.AMPCMS_CACHING_TIMEOUT)
         return pages

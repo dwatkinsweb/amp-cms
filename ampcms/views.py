@@ -52,7 +52,7 @@ def account_handling(request, *args, **kwargs):
         base_template = 'base.html'
         
     if not site.private:
-        module, page = get_public_module_and_page(site, None, None)
+        module, page = get_public_module_and_page(site, None, None, request.user)
         kwargs['site_model'] = site
         page_content = pages.page_mapper.get_item(page.page_class)(request=request, request_kwargs=kwargs, page=page)
         layout = layouts.PCLayout(request=request, request_kwargs=kwargs, page=page_content)

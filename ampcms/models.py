@@ -16,6 +16,7 @@
 #-------------------------------------------------------------------------------
 
 from django.db import models  
+from django.db.models import Q
 from django.db.models.signals import post_save
 from django.contrib.auth.models import User as DjangoUser, Group as DjangoGroup
 from django.contrib.sites.models import Site as DjangoSite
@@ -87,6 +88,7 @@ class Page(models.Model):
     title = models.CharField(max_length=30)
     icon = models.ImageField(upload_to='images/icons/', max_length=1024, null = True, blank = True)
     page_class = models.CharField(max_length=30, choices=[(page_name, page_name) for page_name, page in page_mapper.items])
+    private = models.BooleanField(default=False)
     order = models.IntegerField()
     active = models.BooleanField(default=False)
     module = models.ForeignKey(Module, related_name='pages')
@@ -118,6 +120,7 @@ class Pagelet(models.Model):
     starting_url = models.CharField(max_length=50, blank=True, null=True)
     classes = models.CharField(max_length=50, blank=True, null=True)
     content = models.TextField(blank=True, null=True)
+    private = models.BooleanField(default=False)
     order = models.IntegerField()
     active = models.BooleanField(default=False)
     page = models.ForeignKey(Page, related_name='pagelets')
@@ -177,7 +180,7 @@ if settings.AMPCMS_CACHING:
     PageletAttribute.__bases__ += (CachingMixin,)
     User.__bases__ += (CachingMixin,)
     
-def get_public_module_and_page(site, module_name, page_name):
+def get_public_module_and_page(site, module_name, page_name, user):
     ''' Get the module and the page based on request/url '''
     if site.private:
         # Private sites should never use this function, raise exception and die as a safety measure
@@ -188,7 +191,11 @@ def get_public_module_and_page(site, module_name, page_name):
     try:
         if module_name is None:
             try:
-                page = Page.objects.active().filter(module__site=site)[0]
+                page = Page.objects.active().filter(module__site=site)
+                if user.is_anonymous():
+                    page = page.filter(private=False)[0]
+                else:
+                    page = page.filter(Q(private=False) | Q(user=user) | Q(group__user=user))[0]
             except IndexError, e:
                 message = 'Site %s has no pages' % site
                 log.warning(message)
@@ -199,7 +206,7 @@ def get_public_module_and_page(site, module_name, page_name):
             module = Module.objects.active().get(name=module_name, site=site)
             if page_name is None:
                 try:
-                    page = Page.objects.active_module_pages(module)[0]
+                    page = Page.objects.active_module_pages(user, module)[0]
                 except IndexError, e:
                     message = 'Unable to find default page for module %s on site %s' % (site, module.name)
                     log.warning(message)

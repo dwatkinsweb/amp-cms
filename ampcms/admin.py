@@ -123,7 +123,7 @@ class PageAdmin(admin.ModelAdmin):
     fieldsets = (
         ('Names', {'fields': ('name', 'title')}),
         ('Objects', {'fields': ('module', 'page_class','icon',)}),
-        ('Other', {'fields': ('order', 'active')}))
+        ('Other', {'fields': ('order', 'private', 'active')}))
     list_display = ('full_name', 'name', 'title', 'site', 'module', 'page_class', 'active', 'order', 'view_on_site')
     list_filter = ('active', 'module', 'page_class')
     list_editable = ('order',)
