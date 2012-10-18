@@ -234,6 +234,8 @@ class ApplicationPagelet(BasePagelet):
             self.request.ampcms_module = self.request_kwargs.get(C.URL_KEY_MODULE)
             self.request.ampcms_page = self.request_kwargs.get(C.URL_KEY_PAGE)
             self.request.ampcms_pagelet = self.request_kwargs.get(C.URL_KEY_PAGELET)
+            if self.request.ampcms_pagelet is not None:
+                self.request.ampcms_pagelet = '%s-pagelet' % self.request.ampcms_pagelet
             self.request.ampcms_pagelet_path = self.process_url
             response = view(self.request, *args, **kwargs)
             self.response = response
