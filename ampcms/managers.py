@@ -89,7 +89,7 @@ class PageManager(Manager):
         return pages
     
     def active_user_module_pages(self, user, module):
-        pages = self.active_module_pages(module)
+        pages = self.active_module_pages(user, module)
         if not user.is_superuser:
             pages = pages.filter(Q(user=user) | Q(group__user=user))
         pages = pages.distinct()
