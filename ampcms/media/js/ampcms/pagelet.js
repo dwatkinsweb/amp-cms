@@ -159,6 +159,7 @@ define(['ampcms/sandbox'], function(sandbox) {
 				},
 				// Pagelet Methods
 				load_response : function(response) {
+					window.scrollTo(0,0);
 					var thiz = this
 					core.log(response);
 					this.unregister_all();
