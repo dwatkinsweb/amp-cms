@@ -275,7 +275,6 @@ define(['ampcms/sandbox'], function(sandbox) {
 							target = core.dom.find(event.currentTarget);
 							url = core.dom.attr(target, 'href').split('#')[1];
 							thiz.push_state(url);
-							window.scrollTo(0,0);
 							return false;
 						};
 					}
