@@ -158,7 +158,7 @@ define(['ampcms/sandbox'], function(sandbox) {
 					core.redirect(url);
 				},
 				// Pagelet Methods
-				load_response : function(response) {
+				load_response : function(response, scroll_to_top) {
 					var thiz = this
 					core.log(response);
 					this.unregister_all();
@@ -189,6 +189,9 @@ define(['ampcms/sandbox'], function(sandbox) {
 						thiz.push_state(response.location);
 						thiz.push_message(response.messages);
 					}
+					if (scroll_to_top === true) {
+						window.scrollTo(1,1);
+					}
 				},
 				load : function(url, force_refresh) {
 					var data, thiz = this, new_url;
@@ -204,7 +207,7 @@ define(['ampcms/sandbox'], function(sandbox) {
 							core.dom.trigger(CONTAINER, 'ampcms.pagelet.loadstart');
 							core.ajax.get(new_url, function(response) {
 								core.dom.trigger(CONTAINER, 'ampcms.pagelet.loadajaxcomplete');
-								thiz.load_response(response);
+								thiz.load_response(response, !force_refresh);
 								core.dom.trigger(CONTAINER, 'ampcms.pagelet.loadfullcomplete');
 							});
 						}
