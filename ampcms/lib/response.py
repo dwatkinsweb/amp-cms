@@ -61,6 +61,7 @@ class HttpFixedResponse(HttpResponse):
     pass
 
 def render_to_response(template_name, dictionary=None, context_instance=None):
+    new_template_name = template_name
     if dictionary is not None:
         request = dictionary.get('request')
         if request is not None:
@@ -73,7 +74,5 @@ def render_to_response(template_name, dictionary=None, context_instance=None):
                     new_template_name = template_name
                 new_template_name.insert(0, '%s/%s' % (site.skin, template_name))
                 new_template_name.insert(0, '%s/%s/%s' % (settings.AMPCMS_SKIN_FOLDER, site.skin, template_name))
-    else:
-        new_template_name = template_name
     return django_render_to_response(new_template_name, dictionary, context_instance)
     
