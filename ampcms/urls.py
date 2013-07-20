@@ -17,7 +17,7 @@
 
 from django.conf.urls.defaults import patterns, url
 
-from ampcms.lib.application_mapper import application_mapper
+from ampcms.lib.application.mapper import application_mapper
 from ampcms.conf import settings
 from ampcms import const as C
 

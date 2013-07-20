@@ -14,10 +14,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
-
-from ampcms.lib import layouts, pages
-from ampcms.lib.response import render_to_response
-from ampcms.decorators import acl_required
+from ampcms.lib.content_type import layouts, pages
+from ampcms.lib.http.response import render_to_response
+from ampcms.lib.views.decorators import acl_required
 from ampcms.models import AmpCmsSite, get_public_module_and_page
 from ampcms import const as C
 from django.core.urlresolvers import resolve
@@ -30,7 +29,7 @@ from genshi.template.loader import TemplateNotFound #@UnresolvedImport
 import logging
 log = logging.getLogger(__name__)
 
-def account_handling(request, *args, **kwargs):
+def account_handling(request, **kwargs):
     view_url = kwargs.get('url', '/login')
     view, view_args, view_kwargs = resolve(view_url, settings.AMPCMS_ACCOUNT_URLCONF)
     if request.GET.has_key('next'):
@@ -46,11 +45,11 @@ def account_handling(request, *args, **kwargs):
         base_template = ['%s/%s/base.html' % (settings.AMPCMS_SKIN_FOLDER, site.skin)]
         try:
             select_template(base_template)
-        except TemplateNotFound, e:
+        except TemplateNotFound:
             base_template = 'base.html'
     else:
         base_template = 'base.html'
-        
+
     if not site.private:
         module, page = get_public_module_and_page(site, None, None, request.user)
         kwargs['site_model'] = site
@@ -65,7 +64,7 @@ def account_handling(request, *args, **kwargs):
     context['page'] = page_content
     context['content'] = Markup(response.content)
     context['base'] = base_template
-    if hasattr(response, 'ampcms_media'):
+    if hasattr(response, 'ampcms_media') and response.ampcms_media.title:
         context['title'] = response.ampcms_media.title
     else:
         context['title'] = kwargs.get('title')
@@ -90,17 +89,17 @@ def index(request, *args, **kwargs):
 def full_page(request, *args, **kwargs):
     log.debug('ampcms.views.full_page - start')
     page = kwargs.pop(C.EXTRA_KWARGS_PAGE)
-    log.debug('page: %s' % (page))
+    log.debug('page: %s' % page)
     page_content = pages.page_mapper.get_item(page.page_class)(page=page, request=request, request_kwargs=kwargs)
     layout = layouts.PCLayout(user=request.user, page=page_content, request=request, request_kwargs=kwargs)
     log.debug('ampcms.views.full_page - end')
     return HttpResponse(layout.html())
-    
+
 @acl_required()
 def page(request, *args, **kwargs):
     log.debug('ampcms.views.page - start')
     page = kwargs.pop(C.EXTRA_KWARGS_PAGE)
-    log.debug('page: %s' % (page))
+    log.debug('page: %s' % page)
     page_content = pages.page_mapper.get_item(page.page_class)(page=page, request=request, request_kwargs=kwargs)
     log.debug('ampcms.views.page - end')
     return HttpResponse(page_content.html())
@@ -108,8 +107,8 @@ def page(request, *args, **kwargs):
 @acl_required()
 def pagelet(request, *args, **kwargs):
     log.debug('ampcms.views.pagelet - start')
-    page= kwargs.pop(C.EXTRA_KWARGS_PAGE)
-    log.debug('page: %s' % (page))
+    page = kwargs.pop(C.EXTRA_KWARGS_PAGE)
+    log.debug('page: %s' % page)
     page_content = pages.page_mapper.get_item(page.page_class)(page=page, request=request, request_kwargs=kwargs)
     pagelet_name = kwargs.get(C.URL_KEY_PAGELET)
     pagelet_url = kwargs.get(C.URL_KEY_PAGELET_URL)
@@ -117,13 +116,13 @@ def pagelet(request, *args, **kwargs):
     pagelet_content = page_content.get_pagelet(pagelet_name)
     log.debug('ampcms.views.pagelet - end')
     if pagelet_url:
-        process_url = '/'+pagelet_url
+        process_url = '/' + pagelet_url
     else:
         process_url = '/'
     pagelet_json = pagelet_content.json(process_url)
     if isinstance(pagelet_json, HttpResponse):
         response = pagelet_json
-    else: 
+    else:
         response = HttpResponse(pagelet_json)
     # TODO: Come up with a better way to ignore cache for IE
     if 'MSIE' in request.META['HTTP_USER_AGENT']:

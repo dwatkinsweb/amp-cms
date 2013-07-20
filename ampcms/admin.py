@@ -65,10 +65,13 @@ class GroupAdmin(DjangoGroupAdmin):
 class PageInline(admin.TabularInline):
     model = Page
     extra = 0
+    readonly_fields = ['admin_link']
  
 class PageletInline(admin.TabularInline):
     model = Pagelet
     extra = 0
+    readonly_fields = ['admin_link']
+    exclude = ['content', 'classes']
 
 class PageletAttributeInline(admin.TabularInline):
     model = PageletAttribute
@@ -79,12 +82,15 @@ class ModuleForm(forms.ModelForm):
 class ModuleAdmin(admin.ModelAdmin):
     fieldsets = (
         ('Names', {'fields': ('name', 'title')}),
-        ('Other', {'fields': ('site', 'order', 'active','icon',)}))
+        ('Other', {'fields': ('site', 'order', 'active','icon',)}),
+        ('Redirects', {'classes': ('collapse',),
+                       'fields': ('redirect_module', 'redirect_url')}))
     list_display = ('name', 'title', 'active', 'order', 'site', 'view_on_site')
     list_filter = ('active','site')
     list_editable = ('order',)
     inlines = [PageInline]
     actions = ['activate', 'deactivate']
+    ordering = ['site__domain', 'name']
     
     class Media:
         js = (
@@ -125,10 +131,11 @@ class PageAdmin(admin.ModelAdmin):
         ('Objects', {'fields': ('module', 'page_class','icon',)}),
         ('Other', {'fields': ('order', 'private', 'active')}))
     list_display = ('full_name', 'name', 'title', 'site', 'module', 'page_class', 'active', 'order', 'view_on_site')
-    list_filter = ('active', 'module', 'page_class')
+    list_filter = ('active', 'module__site', 'module', 'page_class')
     list_editable = ('order',)
     inlines = [PageletInline]
     actions = ['activate', 'deactivate']
+    ordering = ['module__site__domain', 'module__name', 'name']
     
     class Media:
         js = (
@@ -177,9 +184,10 @@ class PageletAdmin(admin.ModelAdmin):
         ('Objects', {'fields': ('page', 'pagelet_class', 'application', 'starting_url', 'classes', 'content')}),
         ('Other', {'fields': ('order', 'active')}))
     list_display = ('full_name', 'name', 'title', 'page', 'active', 'pagelet_class', 'order')
-    list_filter = ('active', 'page', 'pagelet_class')
+    list_filter = ('active', 'page__module__site', 'page__module', 'page', 'pagelet_class')
     inlines = [PageletAttributeInline]
     actions = ['activate', 'deactivate']
+    ordering = ['page__module__site__domain', 'page__module__name', 'page__name', 'name']
     
     class Media:
         css = {

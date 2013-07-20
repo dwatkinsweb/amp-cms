@@ -15,10 +15,19 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
 
-"""
-ampcms is a content management system that allows for asycronous loading of multiple pagelets on a single page.
-Features include:
- * pagelets that route to django applications
- * uses ajax to behave like a single page application
-"""
-VERSION = '1.0.0'
+from ampcms.lib.utils.object_mapper import BaseObjectMapper
+from django.conf import settings
+
+class AmpCmsApplication(object):
+    def __init__(self, urlconf=settings.ROOT_URLCONF, url_prefix=None):
+        self.urlconf = urlconf
+        self.url_prefix = url_prefix
+
+class ApplicationMapper(BaseObjectMapper):
+    object_types = (AmpCmsApplication,)
+    item_type = 'Application'
+
+    def item_assertion(self, item):
+        assert isinstance(item, self._get_object_types())
+
+application_mapper = ApplicationMapper()

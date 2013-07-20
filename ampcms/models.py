@@ -14,18 +14,20 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
+from django.core.urlresolvers import reverse
 
 from django.db import models  
 from django.db.models import Q
 from django.db.models.signals import post_save
+from django.db.utils import DatabaseError
 from django.contrib.auth.models import User as DjangoUser, Group as DjangoGroup
 from django.contrib.sites.models import Site as DjangoSite
 
 from ampcms import managers
 from ampcms.lib.exceptions import PageDoesNotExist, NoPermissions
-from ampcms.lib.pages import page_mapper
-from ampcms.lib.pagelets import pagelet_mapper
-from ampcms.lib.application_mapper import application_mapper
+from ampcms.lib.content_type.pages import page_mapper
+from ampcms.lib.content_type.pagelets import pagelet_mapper
+from ampcms.lib.application.mapper import application_mapper
 from ampcms.conf import settings
 
 import logging
@@ -49,6 +51,8 @@ class Module(models.Model):
     name = models.CharField(max_length=30)
     title = models.CharField(max_length=30)
     icon = models.ImageField(upload_to='images/icons/', max_length=1024, null = True, blank = True)
+    redirect_module = models.ForeignKey('self', null=True, blank=True, default=None)
+    redirect_url = models.URLField(null=True, blank=True, default=None)
     order = models.IntegerField(max_length=2)
     active = models.BooleanField(default=False)
     site = models.ForeignKey(AmpCmsSite)
@@ -86,9 +90,9 @@ class Page(models.Model):
     # TODO: Allow for a many to many relationship between page and pagelet
     name = models.CharField(max_length=30)
     title = models.CharField(max_length=30)
-    icon = models.ImageField(upload_to='images/icons/', max_length=1024, null = True, blank = True)
-    page_class = models.CharField(max_length=30, choices=[(page_name, page_name) for page_name, page in page_mapper.items])
+    icon = models.ImageField(upload_to='images/icons/', max_length=1024, null=True, blank=True)
     private = models.BooleanField(default=False)
+    page_class = models.CharField(max_length=30, choices=[(page_name, page_name) for page_name, page in page_mapper.items()])
     order = models.IntegerField()
     active = models.BooleanField(default=False)
     module = models.ForeignKey(Module, related_name='pages')
@@ -103,20 +107,29 @@ class Page(models.Model):
     def natural_key(self):
         return (self.name,) + self.module.natural_key()
     natural_key.dependencies = ['ampcms.module']
+
+    def admin_link(self):
+        if self.pk:
+            admin_link = reverse('admin:ampcms_page_change', args=(self.pk,))
+            return u'<a href="%s">Edit Page</a>' % admin_link
+        else:
+            return u''
+    admin_link.allow_tags = True
+    admin_link.short_description = ''
     
     def __unicode__(self):
         return '%s/%s' % (self.module, self.name)
     
     class Meta:
-        ordering = ['module__order', 'order']
+        ordering = ['module__site', 'module__order', 'order']
         unique_together = (('module', 'name'), ('module', 'order'))
 
 class Pagelet(models.Model):
     name = models.CharField(max_length=30)
     title = models.CharField(max_length=30)
-    pagelet_class = models.CharField(max_length=30, choices=[(pagelet_name, pagelet_name) for pagelet_name, pagelet in pagelet_mapper.items])
+    pagelet_class = models.CharField(max_length=30, choices=[(pagelet_name, pagelet_name) for pagelet_name, pagelet in pagelet_mapper.items()])
     application = models.CharField(max_length=30, blank=True, null=True,
-                                   choices=[(application_name, application_name) for application_name, application in application_mapper.items])
+                                   choices=[(application_name, application_name) for application_name, application in application_mapper.items()])
     starting_url = models.CharField(max_length=50, blank=True, null=True)
     classes = models.CharField(max_length=50, blank=True, null=True)
     content = models.TextField(blank=True, null=True)
@@ -133,12 +146,21 @@ class Pagelet(models.Model):
     def natural_key(self):
         return (self.name,) + self.page.natural_key()
     natural_key.dependencies = ['ampcms.page']
-    
+
+    def admin_link(self):
+        if self.pk:
+            admin_link = reverse('admin:ampcms_pagelet_change', args=(self.pk,))
+            return u'<a href="%s">Edit Pagelet</a>' % admin_link
+        else:
+            return u''
+    admin_link.allow_tags = True
+    admin_link.short_description = ''
+
     def __unicode__(self):
         return '%s/%s' % (self.page, self.name)
     
     class Meta:
-        ordering = ['page__module__order', 'page__order', 'order']
+        ordering = ['page__module__site', 'page__module__order', 'page__order', 'order']
         unique_together = (('page', 'name'), ('page', 'order'))
 
 class PageletAttribute(models.Model):
@@ -204,6 +226,8 @@ def get_public_module_and_page(site, module_name, page_name, user):
                 module = page.module
         else:
             module = Module.objects.active().get(name=module_name, site=site)
+            if module.redirect_url or module.redirect_module is not None:
+                return (module, None)
             if page_name is None:
                 try:
                     page = Page.objects.active_module_pages(user, module)[0]
@@ -255,28 +279,38 @@ def get_private_module_and_page(site, module_name, page_name, user):
     return (module, page)
 
 def create_ampcms_user(sender, instance, created, **kwargs):
-    if created:
-        user, user_created = User.objects.get_or_create(pk=instance.id,
-                                                        defaults={'username':instance.username,
-                                                                  'first_name':instance.first_name,
-                                                                  'last_name':instance.last_name,
-                                                                  'email':instance.email,
-                                                                  'password':instance.password,
-                                                                  'is_staff':instance.is_staff,
-                                                                  'is_active':instance.is_active,
-                                                                  'is_superuser':instance.is_superuser,
-                                                                  'last_login':instance.last_login,
-                                                                  'date_joined':instance.date_joined})
+    try:
+        if created:
+            user, user_created = User.objects.using(instance._state.db).get_or_create(pk=instance.id,
+                                                            defaults={'username':instance.username,
+                                                                      'first_name':instance.first_name,
+                                                                      'last_name':instance.last_name,
+                                                                      'email':instance.email,
+                                                                      'password':instance.password,
+                                                                      'is_staff':instance.is_staff,
+                                                                      'is_active':instance.is_active,
+                                                                      'is_superuser':instance.is_superuser,
+                                                                      'last_login':instance.last_login,
+                                                                      'date_joined':instance.date_joined})
+    except DatabaseError:
+        log.warning('Unable to automatically create ampcms user post_save django_auth.user: %s' % instance)
         
 def create_ampcms_group(sender, instance, created, **kwargs):
-    if created:
-        group, group_created = Group.objects.get_or_create(pk=instance.id)
+    try:
+        if created:
+            group, group_created = Group.objects.using(instance._state.db).get_or_create(pk=instance.id,
+                                                                                         defaults={'name': instance.name})
+    except DatabaseError:
+        log.warning('Unable to automatically create ampcms group post_save django_auth.group: %s' % instance)
 
 def create_ampcms_site(sender, instance, created, **kwargs):
-    if created:
-        site, site_created = AmpCmsSite.objects.get_or_create(pk=instance.id,
-                                                              defaults={'domain':instance.domain,
-                                                                        'name':instance.name})
+    try:
+        if created:
+            site, site_created = AmpCmsSite.objects.using(instance._state.db).get_or_create(pk=instance.id,
+                                                                  defaults={'domain':instance.domain,
+                                                                            'name':instance.name})
+    except DatabaseError:
+        log.warning('Unable to automatically create ampcms site post_save django_auth.site: %s' % instance)
 post_save.connect(create_ampcms_user, sender=DjangoUser)
 post_save.connect(create_ampcms_group, sender=DjangoGroup)
 post_save.connect(create_ampcms_site, sender=DjangoSite)

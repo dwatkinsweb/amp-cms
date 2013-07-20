@@ -1,0 +1,46 @@
+/*
+ * Copyright David Watkins 2011
+ *
+ * AMP-CMS is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+.inline-mover {
+	width: 4px;
+}
+td.inline-mover {
+	background: url("/static/ampcms/images/mover.gif") no-repeat center left transparent;
+	cursor: move;
+}
+.inline-related .original p {
+	margin-left: 30px;
+}
+#changelist-filter {
+	width: 275px;
+}
+.change-list .filtered {
+	background: #EFEFEF !important;
+	min-height: 0px !important;
+}
+.filtered .actions {
+	margin-right: 275px !important;
+}
+.change-list .filtered table, .change-list .filtered .paginator, .filtered #toolbar, .filtered div.xfull {
+	margin-right: 275px !important;
+}
+.change-list .filtered .results, .change-list .filtered .paginator, .filtered #toolbar, .filtered div.xfull {
+	margin-right: 275px !important;
+}
+#changelist table thead th .text {
+	float: left;
+}

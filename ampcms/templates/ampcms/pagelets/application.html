@@ -2,7 +2,7 @@
 	  xmlns:xi="http://www.w3.org/2001/XInclude"
 	  py:strip="">
 	<div py:match="content" class="pagelet-wrapper application-pagelet" id="${data_model.name}-content">
-		<h2 class="pagelet-title">${title}</h2>		
+		<h1 class="pagelet-title">${title}</h1>		
 		<div class="pagelet-content" py:choose="">
 			<py:when test="defined('content')">${content}</py:when>
 			<py:otherwise> </py:otherwise>

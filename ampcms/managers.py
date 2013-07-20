@@ -84,6 +84,8 @@ class PageManager(Manager):
         pages = self.active().filter(module=module)
         if user.is_authenticated():
             pages = pages.filter(Q(private=False) | Q(user=user) | Q(group__user=user))
+        else:
+            pages = pages.filter(private=False)
         if settings.AMPCMS_CACHING:
             pages.cache(timeout=settings.AMPCMS_CACHING_TIMEOUT)
         return pages
@@ -127,9 +129,12 @@ class SiteManager(DjangoSiteManager):
             return self.get_current()
         host = request.get_host()
         current_site = self.get_query_set().filter(domain=host)
-        if settings.AMPCMS_CACHING:
-            current_site.cache(timeout=settings.AMPCMS_CACHING_TIMEOUT)
-        return current_site[0]
+        if len(current_site) > 0:
+            if settings.AMPCMS_CACHING:
+                current_site.cache(timeout=settings.AMPCMS_CACHING_TIMEOUT)
+            return current_site[0]
+        else:
+            return self.get_current()
     
     def get_by_natural_key(self, name, domain):
         return self.get(name=name, domain=domain)

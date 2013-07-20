@@ -1,0 +1,93 @@
+#-------------------------------------------------------------------------------
+# Copyright David Watkins 2011
+# 
+# AMP-CMS is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#-------------------------------------------------------------------------------
+
+from django.utils.datastructures import SortedDict
+from django.db.models import Q
+
+from mapper import ContentTypeMapper
+from base import BaseContentType
+import pagelets
+
+from ampcms import const as C
+
+class BasePage(BaseContentType):
+    '''
+    Base Page object to extend when creating different types of pages
+    '''
+    def __init__(self, page, *args, **kwargs):
+        '''
+        Initialize the Base Page object
+        @param page_model: page instance from the page model
+        '''
+        super(BasePage, self).__init__(*args, **kwargs)
+        self._data_model = page
+        self._template = 'page.html'
+    
+    def _get_html_data(self):
+        data = {C.HTML_DATA_TAG_KEY_URL : self.get_absolute_url(),
+                C.HTML_DATA_TAG_KEY_NAME : self._data_model.name}
+        return data
+    
+    def get_absolute_url(self):
+        '''
+        Get the absolute url for the page based on the page model. Will return /<module>/<page>
+        '''
+        return self._data_model.get_absolute_url()
+
+    def breadcrumbs(self):
+        breadcrumbs = pagelets.BreadCrumbPaglet(request=self.request, request_kwargs=self.request_kwargs)
+        breadcrumbs.append(self._data_model.module.title, self._data_model.module.get_absolute_url())
+        breadcrumbs.append(self._data_model.title, self._data_model.get_absolute_url())
+        return breadcrumbs.markup()
+        
+class PageletPage(BasePage):
+    def get_pagelet(self, pagelet=None):
+        '''
+        Return a pagelet based on name. If no name is given, return the first pagelet in the list.
+        @param pagelet: name of pagelet
+        '''
+        children = self.children()
+        if pagelet is not None:
+            # TODO: Not sure what want to do when not found, maybe raise an exception? currently returns none.
+            pagelet = children.get(pagelet)
+        else:
+            pagelet = children.itervalues().next()
+        return pagelet
+    
+    def _build_children(self):
+        '''
+        Builds the children for the page. Cycles through the children in self.page instance and returns a dictionary
+        in the structure {<pagelet.name>:<pagelet>, ...}
+        '''
+        _pagelets = SortedDict()
+        from ampcms.models import Pagelet, AmpCmsSite
+        site = AmpCmsSite.objects.get_by_request(self.request)
+        if not site.private:
+            loadable_pagelets = self._data_model.pagelets.active()
+            if self.request.user.is_anonymous():
+                loadable_pagelets = loadable_pagelets.filter(private=False)
+            else:
+                loadable_pagelets = loadable_pagelets.filter(Q(private=False) | Q(user=self.request.user) | Q(group__user=self.request.user))
+        else:
+            loadable_pagelets = Pagelet.objects.active_user_page_pagelets(self.request.user, self._data_model)
+        for pagelet in loadable_pagelets:
+            pagelet_class = pagelets.pagelet_mapper.get_item(pagelet.pagelet_class)
+            _pagelets[pagelet.name] = pagelet_class(request=self.request, request_kwargs=self.request_kwargs, pagelet=pagelet)
+        return _pagelets
+
+page_mapper = ContentTypeMapper(BasePage)
+page_mapper.register('PageletPage', PageletPage)
