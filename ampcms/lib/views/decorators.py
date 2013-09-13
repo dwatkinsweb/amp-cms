@@ -176,3 +176,16 @@ def permission_required(perm, login_url=None):
     enabled, redirecting to the log-in page if necessary.
     """
     return user_passes_test(lambda u: u.has_perm(perm), login_url=login_url)
+
+def secure_required(view_func):
+    """Decorator makes sure URL is accessed over https."""
+    def _wrapped_view_func(request, *args, **kwargs):
+        if not request.is_secure():
+            if request.is_ampcms:
+                return HttpResponseSSLRedirect()
+            else:
+                request_url = request.build_absolute_uri(request.get_full_path())
+                secure_url = request_url.replace('http://', 'https://')
+                return HttpResponseRedirect(secure_url)
+        return view_func(request, *args, **kwargs)
+    return _wrapped_view_func
