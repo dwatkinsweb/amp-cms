@@ -1,6 +1,5 @@
 .project
 .pydevproject
-atlassian-ide-plugin.xml
-.idea
 *.pyc
 .svn
+.settings

@@ -51,6 +51,9 @@ define(['jquery'], function() {
 			replace : function(element, html) {
 				return jQuery(element).replaceWith(html);
 			},
+			empty : function(selector) {
+				jQuery(selector).empty();
+			},
 			data : function(element, key, data) {
 				var ret;
 				if( typeof key === 'undefined') {
@@ -144,6 +147,9 @@ define(['jquery'], function() {
 		},
 		// Utility Methods
 		utils : {
+            is_float : function (n) {
+                return n ===+n && n !== (n | 0);
+            },
 			is_array : function(arr) {
 				return jQuery.isArray(arr);
 			},
