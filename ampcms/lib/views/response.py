@@ -11,7 +11,7 @@ class AmpCmsDjangoResponse(AmpCmsResponse, AmpCmsTemplateResponse): pass
 
 class AmpCmsGenshiResponse(AmpCmsResponse, AmpCmsTemplateResponse):
     def resolve_template(self, template):
-        "Accepts a template object, path-to-template or list of paths"
+        """Accepts a template object, path-to-template or list of paths"""
         if isinstance(template, (list, tuple)):
             return genshi_loader.select_template(template)
         elif isinstance(template, basestring):

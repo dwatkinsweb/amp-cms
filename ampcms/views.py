@@ -17,6 +17,7 @@
 from ampcms.lib.content_type import layouts, pages
 from ampcms.lib.http.response import render_to_response
 from ampcms.lib.views.decorators import acl_required
+from ampcms.lib.views.response import AmpCmsTemplateResponse
 from ampcms.models import AmpCmsSite, get_public_module_and_page
 from ampcms import const as C
 from django.core.urlresolvers import resolve
@@ -62,7 +63,15 @@ def account_handling(request, **kwargs):
     context = RequestContext(request)
     context['menus'] = menus
     context['page'] = page_content
-    context['content'] = Markup(response.content)
+    if isinstance(response, AmpCmsTemplateResponse):
+        pagelet_content = response.rendered_content
+    elif hasattr(response, 'render'):
+        pagelet_content = response.render().content
+    elif hasattr(response, 'content'):
+        pagelet_content = response.content
+    else:
+        pagelet_content = response
+    context['content'] = Markup(pagelet_content)
     context['base'] = base_template
     if hasattr(response, 'ampcms_media') and response.ampcms_media.title:
         context['title'] = response.ampcms_media.title
