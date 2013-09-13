@@ -96,7 +96,7 @@ class BaseContentType(object):
         '''
         Return the rendered layout as an html safe object
         '''
-        return Markup(self.html(template))
+        return Markup(self.html(template).decode('utf-8'))
     
     def _to_stream(self, template=None):
         '''
