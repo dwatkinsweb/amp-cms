@@ -265,7 +265,9 @@ define(['ampcms/sandbox'], function(sandbox) {
 						anchor = anchors[_i];
 						href = core.dom.attr(anchor, 'href');
 						if (typeof href !== 'undefined'
-							&& href.slice(0,6) !== 'mailto') {
+							&& href.slice(0,6) !== 'mailto'
+                            && href.slice(0,1) !== '#'
+                            && href.slice(0,10) !== 'javascript') {
 							transform_type = core.dom.data(anchor, 'ampcms-transform');
 							if (transform_type == 'newpage') {
 								href = thiz._build_url(href.replace(/^.*\.com/, ''));
