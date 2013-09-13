@@ -15,6 +15,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
 
+try:
+    from import_export.admin import ImportExportModelAdmin as ModelAdmin
+except ImportError:
+    from django.contrib.admin import ModelAdmin
 from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin, GroupAdmin as DjangoGroupAdmin
 from django.contrib.auth.forms import UserChangeForm as DjangoUserChangeForm, UserCreationForm as DjangoUserCreationForm
 from django.contrib.sites.admin import SiteAdmin as DjangoSiteAdmin
@@ -79,7 +83,7 @@ class PageletAttributeInline(admin.TabularInline):
 class ModuleForm(forms.ModelForm):
     model = Module
 
-class ModuleAdmin(admin.ModelAdmin):
+class ModuleAdmin(ModelAdmin):
     fieldsets = (
         ('Names', {'fields': ('name', 'title')}),
         ('Other', {'fields': ('site', 'order', 'active','icon',)}),
@@ -125,7 +129,7 @@ class ModuleAdmin(admin.ModelAdmin):
             return ''
     view_on_site.allow_tags = True
 
-class PageAdmin(admin.ModelAdmin):
+class PageAdmin(ModelAdmin):
     fieldsets = (
         ('Names', {'fields': ('name', 'title')}),
         ('Objects', {'fields': ('module', 'page_class','icon',)}),
@@ -178,7 +182,7 @@ class PageAdmin(admin.ModelAdmin):
             return ''
     view_on_site.allow_tags = True
 
-class PageletAdmin(admin.ModelAdmin):
+class PageletAdmin(ModelAdmin):
     fieldsets = (
         ('Names', {'fields': ('name', 'title')}),
         ('Objects', {'fields': ('page', 'pagelet_class', 'application', 'starting_url', 'classes', 'content')}),
