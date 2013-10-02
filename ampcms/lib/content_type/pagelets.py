@@ -14,8 +14,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
-from django.utils.encoding import smart_unicode
-
 from genshi.core import Markup #@UnresolvedImport
 from django_genshi.shortcuts import render_to_stream #@UnresolvedImport
 from django.http import HttpResponse, HttpResponseRedirect, Http404
@@ -23,7 +21,7 @@ from django.core.urlresolvers import resolve, set_urlconf, get_resolver
 from django.contrib import messages
 from ampcms.lib.application.mapper import application_mapper
 from ampcms.lib.http.response import AMPCMSAjaxResponse, HttpFixedResponse, HttpResponseFullRedirect, HttpResponseSSLRedirect
-from ampcms.lib.views.response import AmpCmsResponse, AmpCmsTemplateResponse
+from ampcms.lib.views.response import AmpCmsTemplateResponse
 
 from base import BaseContentType
 from mapper import ContentTypeMapper
@@ -38,6 +36,7 @@ import os
 import logging
 from django.core.exceptions import PermissionDenied
 import sys
+from django.utils.encoding import force_unicode
 log = logging.getLogger(__name__)
 
 class BasePagelet(BaseContentType):
@@ -211,7 +210,7 @@ class ApplicationPagelet(BasePagelet):
             response = HttpResponse(json.dumps({C.JSON_KEY_REDIRECT: False,
                                C.JSON_KEY_NAME: self._data_model.name,
                                C.JSON_KEY_LOCATION: self.process_url,
-                               C.JSON_KEY_HTML: Markup(html.decode('utf-8')),
+                               C.JSON_KEY_HTML: Markup(html),
                                C.JSON_KEY_CSS: self._build_css(),
                                C.JSON_KEY_JS: self._build_js(),
                                C.JSON_KEY_MESSAGES : [{'message': message.message, 'level': message.level, 'tags': message.tags} for message in messages.get_messages(self.request)]
@@ -279,7 +278,8 @@ class ApplicationPagelet(BasePagelet):
             else:
                 pagelet_response = response
             set_urlconf(None)
-            return Markup(pagelet_response.decode('utf-8'))
+            # Forcing back to unicode because Django's HttpResponse.content returns as a string.
+            return Markup(force_unicode(pagelet_response))
         except Http404, e:
             set_urlconf(None)
             log.error('Page not found loading application pagelet: %s' % e, exc_info=True, extra={'request':self.request})

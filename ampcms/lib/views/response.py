@@ -2,6 +2,7 @@ from django.template.response import TemplateResponse
 from django_genshi import Context, RequestContext
 from django_genshi import loader as genshi_loader
 from django_genshi.shortcuts import _get_filters
+from django.utils.encoding import force_unicode
 
 class AmpCmsResponse(object): pass
 
@@ -41,5 +42,6 @@ class AmpCmsGenshiResponse(AmpCmsResponse, AmpCmsTemplateResponse):
         context = self.resolve_context(self.context_data)
         stream = template.generate(context)
         filtered = stream.filter (*_get_filters())
-        content = filtered.render('html', encoding=settings.DEFAULT_CHARSET, strip_whitespace=False)
+        # forcing rendered content back to unicode because the filtered stream returns a string.
+        content = force_unicode(filtered.render('html', encoding=settings.DEFAULT_CHARSET, strip_whitespace=False))
         return content
