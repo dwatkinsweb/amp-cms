@@ -55,6 +55,7 @@ class Module(models.Model):
     redirect_url = models.URLField(null=True, blank=True, default=None)
     order = models.IntegerField(max_length=2)
     active = models.BooleanField(default=False)
+    show_in_navigation = models.BooleanField(default=True)
     site = models.ForeignKey(AmpCmsSite)
 
     objects = managers.ModuleManager()
@@ -95,6 +96,7 @@ class Page(models.Model):
     page_class = models.CharField(max_length=30, choices=[(page_name, page_name) for page_name, page in page_mapper.items()])
     order = models.IntegerField()
     active = models.BooleanField(default=False)
+    show_in_navigation = models.BooleanField(default=True)
     module = models.ForeignKey(Module, related_name='pages')
     pagelet_layout = models.CharField(max_length=30, blank=True, null=True,
                                       choices=[(layout, layout) for layout in settings.AMPCMS_PAGELET_LAYOUTS])
