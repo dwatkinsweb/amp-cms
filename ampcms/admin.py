@@ -85,8 +85,8 @@ class ModuleForm(forms.ModelForm):
 
 class ModuleAdmin(ModelAdmin):
     fieldsets = (
-        ('Names', {'fields': ('name', 'title')}),
-        ('Other', {'fields': ('site', 'order', 'active','icon',)}),
+        ('Names', {'fields': ('name', 'title', 'icon')}),
+        ('Other', {'fields': ('site', 'order', 'active', 'show_in_navigation')}),
         ('Redirects', {'classes': ('collapse',),
                        'fields': ('redirect_module', 'redirect_url')}))
     list_display = ('name', 'title', 'active', 'order', 'site', 'view_on_site')
@@ -131,9 +131,9 @@ class ModuleAdmin(ModelAdmin):
 
 class PageAdmin(ModelAdmin):
     fieldsets = (
-        ('Names', {'fields': ('name', 'title')}),
-        ('Objects', {'fields': ('module', 'page_class','icon',)}),
-        ('Other', {'fields': ('order', 'private', 'active')}))
+        ('Names', {'fields': ('name', 'title', 'icon')}),
+        ('Objects', {'fields': ('module', 'page_class',)}),
+        ('Other', {'fields': ('order', 'private', 'active', 'show_in_navigation')}))
     list_display = ('full_name', 'name', 'title', 'site', 'module', 'page_class', 'active', 'order', 'view_on_site')
     list_filter = ('active', 'module__site', 'module', 'page_class')
     list_editable = ('order',)
