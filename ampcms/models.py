@@ -109,7 +109,7 @@ class Module(models.Model):
 
 class ModuleDetails(models.Model):
     module = models.ForeignKey(Module, related_name='details')
-    language = models.CharField(max_length=8, choices=settings.LANGUAGES)
+    language = models.CharField(max_length=8)
     title = models.CharField(max_length=30)
 
     class Meta:
