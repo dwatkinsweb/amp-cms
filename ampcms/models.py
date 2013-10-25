@@ -66,9 +66,9 @@ class Module(models.Model):
     @property
     def current_details(self):
         if self._current_details is None:
-            langauge = translation.get_language()
+            language = translation.get_language()
             try:
-                self._current_details = self.details.get(langauge=langauge)
+                self._current_details = self.details.get(language=language)
             except ModuleDetails.DoesNotExist:
                 try:
                     self._current_details = self.details.get(language=settings.LANGUAGE_CODE)
@@ -109,11 +109,14 @@ class Module(models.Model):
 
 class ModuleDetails(models.Model):
     module = models.ForeignKey(Module, related_name='details')
-    language = models.CharField(max_length=8)
+    language = models.CharField(max_length=8, choices=settings.LANGUAGES)
     title = models.CharField(max_length=30)
 
     class Meta:
         unique_together = ('module', 'language')
+
+    def __unicode__(self):
+        return u'%s: %s' % (self.module, self.language)
 
 class Page(models.Model):
     # TODO: Allow for a many to many relationship between page and pagelet
@@ -138,13 +141,13 @@ class Page(models.Model):
     @property
     def current_details(self):
         if self._current_details is None:
-            langauge = translation.get_language()
+            language = translation.get_language()
             try:
-                self._current_details = self.details.get(langauge=langauge)
-            except ModuleDetails.DoesNotExist:
+                self._current_details = self.details.get(language=language)
+            except PageDetails.DoesNotExist:
                 try:
                     self._current_details = self.details.get(language=settings.LANGUAGE_CODE)
-                except ModuleDetails.DoesNotExist:
+                except PageDetails.DoesNotExist:
                     self._current_details = self.details.all()[0]
         return self._current_details
 
@@ -206,13 +209,13 @@ class Pagelet(models.Model):
     @property
     def current_details(self):
         if self._current_details is None:
-            langauge = translation.get_language()
+            language = translation.get_language()
             try:
-                self._current_details = self.details.get(langauge=langauge)
-            except ModuleDetails.DoesNotExist:
+                self._current_details = self.details.get(language=language)
+            except PageletDetails.DoesNotExist:
                 try:
                     self._current_details = self.details.get(language=settings.LANGUAGE_CODE)
-                except ModuleDetails.DoesNotExist:
+                except PageletDetails.DoesNotExist:
                     self._current_details = self.details.all()[0]
         return self._current_details
 

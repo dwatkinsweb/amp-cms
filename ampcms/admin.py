@@ -26,7 +26,7 @@ from django.contrib import admin
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 
-from ampcms.models import Module, Page, Pagelet, PageletAttribute, User, Group, AmpCmsSite
+from ampcms.models import Module, Page, Pagelet, PageletAttribute, User, Group, AmpCmsSite, PageDetails, PageletDetails, ModuleDetails
 from ampcms.conf import settings
 
 class SiteAdmin(DjangoSiteAdmin):
@@ -66,6 +66,18 @@ class UserAdmin(DjangoUserAdmin):
 class GroupAdmin(DjangoGroupAdmin):
     filter_horizontal = ('permissions', 'acl_pages', 'acl_pagelets')
 
+class ModuleDetailsInline(admin.TabularInline):
+    model = ModuleDetails
+    extra = 0
+
+class PageDetailsInline(admin.TabularInline):
+    model = PageDetails
+    extra = 0
+
+class PageletDetailsInline(admin.TabularInline):
+    model = PageletDetails
+    extra = 0
+
 class PageInline(admin.TabularInline):
     model = Page
     extra = 0
@@ -75,7 +87,7 @@ class PageletInline(admin.TabularInline):
     model = Pagelet
     extra = 0
     readonly_fields = ['admin_link']
-    exclude = ['content', 'classes']
+    exclude = ['classes']
 
 class PageletAttributeInline(admin.TabularInline):
     model = PageletAttribute
@@ -85,14 +97,14 @@ class ModuleForm(forms.ModelForm):
 
 class ModuleAdmin(ModelAdmin):
     fieldsets = (
-        ('Names', {'fields': ('name', 'title', 'icon')}),
+        ('Names', {'fields': ('name', 'icon')}),
         ('Other', {'fields': ('site', 'order', 'active', 'show_in_navigation')}),
         ('Redirects', {'classes': ('collapse',),
                        'fields': ('redirect_module', 'redirect_url')}))
     list_display = ('name', 'title', 'active', 'order', 'site', 'view_on_site')
-    list_filter = ('active','site')
+    list_filter = ('active', 'site')
     list_editable = ('order',)
-    inlines = [PageInline]
+    inlines = [ModuleDetailsInline, PageInline]
     actions = ['activate', 'deactivate']
     ordering = ['site__domain', 'name']
     
@@ -131,13 +143,13 @@ class ModuleAdmin(ModelAdmin):
 
 class PageAdmin(ModelAdmin):
     fieldsets = (
-        ('Names', {'fields': ('name', 'title', 'icon')}),
+        ('Names', {'fields': ('name', 'icon')}),
         ('Objects', {'fields': ('module', 'page_class',)}),
         ('Other', {'fields': ('order', 'private', 'active', 'show_in_navigation')}))
     list_display = ('full_name', 'name', 'title', 'site', 'module', 'page_class', 'active', 'order', 'view_on_site')
     list_filter = ('active', 'module__site', 'module', 'page_class')
     list_editable = ('order',)
-    inlines = [PageletInline]
+    inlines = [PageDetailsInline, PageletInline]
     actions = ['activate', 'deactivate']
     ordering = ['module__site__domain', 'module__name', 'name']
     
@@ -184,12 +196,12 @@ class PageAdmin(ModelAdmin):
 
 class PageletAdmin(ModelAdmin):
     fieldsets = (
-        ('Names', {'fields': ('name', 'title')}),
-        ('Objects', {'fields': ('page', 'pagelet_class', 'application', 'starting_url', 'classes', 'content')}),
+        ('Names', {'fields': ('name',)}),
+        ('Objects', {'fields': ('page', 'pagelet_class', 'application', 'starting_url', 'classes')}),
         ('Other', {'fields': ('order', 'active')}))
     list_display = ('full_name', 'name', 'title', 'page', 'active', 'pagelet_class', 'order')
     list_filter = ('active', 'page__module__site', 'page__module', 'page', 'pagelet_class')
-    inlines = [PageletAttributeInline]
+    inlines = [PageletDetailsInline, PageletAttributeInline]
     actions = ['activate', 'deactivate']
     ordering = ['page__module__site__domain', 'page__module__name', 'page__name', 'name']
     
