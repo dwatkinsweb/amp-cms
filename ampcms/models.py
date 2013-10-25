@@ -49,7 +49,6 @@ class AmpCmsSite(DjangoSite):
 
 class Module(models.Model):
     name = models.CharField(max_length=30)
-    title = models.CharField(max_length=30)
     icon = models.ImageField(upload_to='images/icons/', max_length=1024, null=True, blank=True)
     redirect_module = models.ForeignKey('self', null=True, blank=True, default=None)
     redirect_url = models.URLField(null=True, blank=True, default=None)
@@ -59,6 +58,10 @@ class Module(models.Model):
     site = models.ForeignKey(AmpCmsSite)
 
     objects = managers.ModuleManager()
+
+    def __init__(self, *args, **kwargs):
+        self._current_details = None
+        super(Module, self).__init__(*args, **kwargs)
 
     @property
     def current_details(self):
@@ -77,17 +80,9 @@ class Module(models.Model):
     def active_pages(self):
         return self.pages.filter(active=True)
 
-    def __init__(self, *args, **kwargs):
-        self._current_details = None
-        super(Module, self).__init__(*args, **kwargs)
-
-    def __unicode__(self):
-        return '%s/%s' % (self.site, self.name)
-
-    def natural_key(self):
-        return (self.name,) + self.site.natural_key()
-
-    natural_key.dependencies = ['ampcms.ampcmssite']
+    @property
+    def title(self):
+        return self.current_details.title
 
     def save(self, *args, **kwargs):
         if self.order is None:
@@ -98,17 +93,12 @@ class Module(models.Model):
                 self.order = 1
         return super(Module, self).save(*args, **kwargs)
 
-    def get_absolute_url(self):
-        return '/%s' % self.name
-
-    @property
-    def active_pages(self):
-        return self.pages.filter(active=True)
-
     def natural_key(self):
         return (self.name,) + self.site.natural_key()
-
     natural_key.dependencies = ['ampcms.ampcmssite']
+
+    def get_absolute_url(self):
+        return '/%s' % self.name
 
     def __unicode__(self):
         return '%s/%s' % (self.site, self.name)
@@ -128,7 +118,6 @@ class ModuleDetails(models.Model):
 class Page(models.Model):
     # TODO: Allow for a many to many relationship between page and pagelet
     name = models.CharField(max_length=30)
-    title = models.CharField(max_length=30)
     icon = models.ImageField(upload_to='images/icons/', max_length=1024, null=True, blank=True)
     private = models.BooleanField(default=False)
     page_class = models.CharField(max_length=30,
@@ -142,12 +131,32 @@ class Page(models.Model):
 
     objects = managers.PageManager()
 
+    def __init__(self, *args, **kwargs):
+        self._current_details = None
+        super(Page, self).__init__(*args, **kwargs)
+
+    @property
+    def current_details(self):
+        if self._current_details is None:
+            langauge = translation.get_language()
+            try:
+                self._current_details = self.details.get(langauge=langauge)
+            except ModuleDetails.DoesNotExist:
+                try:
+                    self._current_details = self.details.get(language=settings.LANGUAGE_CODE)
+                except ModuleDetails.DoesNotExist:
+                    self._current_details = self.details.all()[0]
+        return self._current_details
+
+    @property
+    def title(self):
+        return self.current_details.title
+
     def get_absolute_url(self):
         return '/%s/%s' % (self.module.name, self.name)
 
     def natural_key(self):
         return (self.name,) + self.module.natural_key()
-
     natural_key.dependencies = ['ampcms.module']
 
     def admin_link(self):
@@ -156,7 +165,6 @@ class Page(models.Model):
             return u'<a href="%s">Edit Page</a>' % admin_link
         else:
             return u''
-
     admin_link.allow_tags = True
     admin_link.short_description = ''
 
@@ -177,7 +185,6 @@ class PageDetails(models.Model):
 
 class Pagelet(models.Model):
     name = models.CharField(max_length=30)
-    title = models.CharField(max_length=30)
     pagelet_class = models.CharField(max_length=30, choices=[(pagelet_name, pagelet_name) for pagelet_name, pagelet in
                                                              pagelet_mapper.items()])
     application = models.CharField(max_length=30, blank=True, null=True,
@@ -185,7 +192,6 @@ class Pagelet(models.Model):
                                             application_mapper.items()])
     starting_url = models.CharField(max_length=50, blank=True, null=True)
     classes = models.CharField(max_length=50, blank=True, null=True)
-    content = models.TextField(blank=True, null=True)
     private = models.BooleanField(default=False)
     order = models.IntegerField()
     active = models.BooleanField(default=False)
@@ -193,12 +199,36 @@ class Pagelet(models.Model):
 
     objects = managers.PageletManager()
 
+    def __init__(self, *args, **kwargs):
+        self._current_details = None
+        super(Pagelet, self).__init__(*args, **kwargs)
+
+    @property
+    def current_details(self):
+        if self._current_details is None:
+            langauge = translation.get_language()
+            try:
+                self._current_details = self.details.get(langauge=langauge)
+            except ModuleDetails.DoesNotExist:
+                try:
+                    self._current_details = self.details.get(language=settings.LANGUAGE_CODE)
+                except ModuleDetails.DoesNotExist:
+                    self._current_details = self.details.all()[0]
+        return self._current_details
+
+    @property
+    def title(self):
+        return self.current_details.title
+
+    @property
+    def content(self):
+        return self.current_details.content
+
     def get_absolute_url(self):
         return '/pagelet/%s/%s/%s' % (self.page.module.name, self.page.name, self.name)
 
     def natural_key(self):
         return (self.name,) + self.page.natural_key()
-
     natural_key.dependencies = ['ampcms.page']
 
     def admin_link(self):
@@ -207,7 +237,6 @@ class Pagelet(models.Model):
             return u'<a href="%s">Edit Pagelet</a>' % admin_link
         else:
             return u''
-
     admin_link.allow_tags = True
     admin_link.short_description = ''
 
@@ -358,7 +387,7 @@ def create_ampcms_user(sender, instance, created, **kwargs):
                                                      'is_active': instance.is_active,
                                                      'is_superuser': instance.is_superuser,
                                                      'last_login': instance.last_login,
-                                                     'date_joined': instance.date_joined})
+                                                     'date_joined': instance.date_joined}))
     except DatabaseError:
         log.warning('Unable to automatically create ampcms user post_save django_auth.user: %s' % instance)
 
