@@ -23,6 +23,7 @@ from ampcms import const as C
 from django.core.urlresolvers import resolve
 from django.http import HttpResponse, HttpResponseRedirect
 from django.conf import settings
+from django.utils.encoding import force_unicode
 from django_genshi import RequestContext, select_template #@UnresolvedImport
 from genshi.core import Markup #@UnresolvedImport
 from genshi.template.loader import TemplateNotFound #@UnresolvedImport
@@ -71,7 +72,7 @@ def account_handling(request, **kwargs):
         pagelet_content = response.content
     else:
         pagelet_content = response
-    context['content'] = Markup(pagelet_content)
+    context['content'] = Markup(force_unicode(pagelet_content))
     context['base'] = base_template
     if hasattr(response, 'ampcms_media') and response.ampcms_media.title:
         context['title'] = response.ampcms_media.title
