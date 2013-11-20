@@ -203,7 +203,8 @@ class ApplicationPagelet(BasePagelet):
                                C.JSON_KEY_HTML: '',
                                C.JSON_KEY_CSS: self._build_css(),
                                C.JSON_KEY_JS: self._build_js()}))
-        elif isinstance(application_content, HttpResponseRedirect) or isinstance(application_content, HttpFixedResponse):
+        elif isinstance(application_content, HttpResponseRedirect) \
+                or isinstance(application_content, HttpFixedResponse):
             response = application_content
         else:
             html = self.html(include_content=application_content)
@@ -213,7 +214,12 @@ class ApplicationPagelet(BasePagelet):
                                C.JSON_KEY_HTML: Markup(html),
                                C.JSON_KEY_CSS: self._build_css(),
                                C.JSON_KEY_JS: self._build_js(),
-                               C.JSON_KEY_MESSAGES : [{'message': message.message, 'level': message.level, 'tags': message.tags} for message in messages.get_messages(self.request)]
+                               C.JSON_KEY_MESSAGES : [
+                                   {'message': message.message.decode('utf8'),
+                                    'level': message.level,
+                                    'tags': message.tags}
+                                   for message
+                                   in messages.get_messages(self.request)]
             }))
         if self.response is not None and len(self.response.cookies) > 0:
             response.cookies = self.response.cookies
