@@ -3,3 +3,5 @@
 *.pyc
 .svn
 .settings
+.idea
+atlassian-ide-plugin.xml
