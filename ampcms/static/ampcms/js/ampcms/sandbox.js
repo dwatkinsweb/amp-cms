@@ -25,8 +25,8 @@ define(function() {
 				log : function(severity, message) {
 					pagelet.log(severity, message);
 				},
-				push_url : function(url) {
-					pagelet.load(url);
+				push_url : function(url, force_refresh) {
+					pagelet.load(url, force_refresh);
 				},
 				refresh_pagelet : function() {
 					pagelet.load(null, true);
