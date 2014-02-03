@@ -22,7 +22,7 @@ from ampcms.lib.api.api import build_url
 from ampcms import const as C
 from django.utils.functional import wraps
 from django.utils.decorators import available_attrs
-from django.utils.http import urlquote
+from django.utils.http import urlquote, urlencode
 from django.http import HttpResponseRedirect, HttpResponsePermanentRedirect
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from ampcms.conf import settings
@@ -129,7 +129,7 @@ def ampcms_ajax_view(view_func):
     return wraps(view_func)(wrapped_view)
 
 
-def user_passes_test(test_func, login_url=None, redirect_field_name=REDIRECT_FIELD_NAME):
+def user_passes_test(test_func, login_url=None, redirect_field_name=REDIRECT_FIELD_NAME, **query_kwargs):
     """
     Decorator for views that checks that the user passes the given test,
     redirecting to the log-in page if necessary. The test should be a callable
@@ -144,26 +144,26 @@ def user_passes_test(test_func, login_url=None, redirect_field_name=REDIRECT_FIE
                 return view_func(request, *args, **kwargs)
             
             site = AmpCmsSite.objects.get_by_request(request)
-            # TODO: redirect to accept a message of some sort to say why we're requesting a login
             continue_url = build_url(site=site,
                                      module_name=request.ampcms_module,
                                      page_name=request.ampcms_page,
                                      pagelet_urls={request.ampcms_pagelet: request.ampcms_pagelet_path})
 
-            continue_url = urlquote(continue_url)
-            tup = login_url, redirect_field_name, continue_url
-            return HttpResponseFullRedirect('%s?%s=%s' % tup)
+            continue_url = continue_url
+            query_kwargs[redirect_field_name] = continue_url
+            return HttpResponseFullRedirect('%s?%s' % (login_url, urlencode(query_kwargs)))
         return wraps(view_func, assigned=available_attrs(view_func))(_wrapped_view)
     return decorator
 
-def login_required(function=None, redirect_field_name=REDIRECT_FIELD_NAME):
+def login_required(function=None, redirect_field_name=REDIRECT_FIELD_NAME, **query_kwargs):
     """
     Decorator for views that checks that the user is logged in, redirecting
     to the log-in page if necessary.
     """
     actual_decorator = user_passes_test(
         lambda u: u.is_authenticated(),
-        redirect_field_name=redirect_field_name
+        redirect_field_name=redirect_field_name,
+        **query_kwargs
     )
     if function:
         return actual_decorator(function)
