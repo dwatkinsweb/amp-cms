@@ -329,7 +329,7 @@ def get_public_module_and_page(site, module_name, page_name, user):
                 try:
                     page = Page.objects.active_module_pages(user, module)[0]
                 except IndexError, e:
-                    message = 'Unable to find default page for module %s on site %s' % (site, module.name)
+                    message = 'Unable to find default page for module %s on site %s' % (module.name, site)
                     log.warning(message)
                     raise PageDoesNotExist(message)
             else:
