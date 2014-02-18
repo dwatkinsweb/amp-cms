@@ -258,7 +258,7 @@ define(['ampcms/sandbox'], function(sandbox) {
 					if (typeof container_element === 'undefined') {
 						container_element = CONTAINER;
 					}
-					var thiz = this, anchor, anchors, transformed_anchors, transform_type, href, _i, _len;
+					var thiz = this, anchor, anchors, transformed_anchors, transform_type, href, pagelet_query, _i, _len;
 					anchors = container_element.find('a[target!=_blank][data-ampcms-transform!=ignore]');
 					transformed_anchors = [];
 					for( _i = 0, _len = anchors.length; _i < _len; _i++) {
@@ -277,20 +277,23 @@ define(['ampcms/sandbox'], function(sandbox) {
 							} else {
 								href = href.replace(/^.*\.com/, '');
 								if (href.charAt(0) != '#') {
-									href = '#' + href;
+									pagelet_query = core.parse_query_string(window.location.search);
+									pagelet_query[pagelet_selector] = href;
+									href = '?'+core.build_query_string(pagelet_query);
+									transformed_anchors.push(anchor);
 								}
-								transformed_anchors.push(anchor);
 							}
 							core.dom.attr(anchor, 'href', href);
 						}
 					}
 					if (typeof callback === 'undefined' || callback === null) {
 						callback = function(event) {
-							var target, url;
-							target = core.dom.find(event.currentTarget);
-							url = core.dom.attr(target, 'href').split('#')[1];
-							thiz.push_state(url);
-							return false;
+							if (!event.ctrlKey && !event.metaKey && !event.shiftKey && !event.altKey) {
+								var target, url;
+								target = core.dom.find(event.currentTarget);
+								thiz.push_state(core.parse_query_string(core.dom.attr(target, 'href'))[pagelet_selector][0]);
+								return false;
+							}
 						};
 					}
 					core.dom.bind(transformed_anchors, 'click', callback);
