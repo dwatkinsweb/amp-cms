@@ -57,7 +57,7 @@ urlpatterns = patterns('ampcms.views',
             % (C.URL_KEY_MODULE, C.URL_KEY_PAGE),
         view=C.VIEW_NAME_PAGE,
         name=C.VIEW_NAME_PAGE),
-    url(r'^pagelet/(?P<%s>[a-zA-Z0-9_\-]+)/(?P<%s>[a-zA-Z0-9_\-]+)/(?P<%s>[a-zA-Z0-9_\-]+)/?(?P<%s>[a-zA-Z0-9\/\-_]+)?'
+    url(r'^pagelet/(?P<%s>[a-zA-Z0-9_\-]+)/(?P<%s>[a-zA-Z0-9_\-]+)/(?P<%s>[a-zA-Z0-9_\-]+)/?(?P<%s>.+)?$'
             % (C.URL_KEY_MODULE, C.URL_KEY_PAGE, C.URL_KEY_PAGELET, C.URL_KEY_PAGELET_URL),
         view=C.VIEW_NAME_PAGELET,
         name=C.VIEW_NAME_PAGELET),
