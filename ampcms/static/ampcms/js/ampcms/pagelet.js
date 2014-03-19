@@ -198,12 +198,18 @@ define(['ampcms/sandbox'], function(sandbox) {
 					if(url == null) {
 						url = this._get_url();
 					}
+					// Some urls come through with the slashes encoded which causes problems
+					url = url.replace('%2F', '/');
 					core.log('pagelet loading with url: ' + url)
 					if(url != null && typeof url !== 'undefined') {
 						core.log('loading url: ' + url);
 						new_url = this._build_url(url);
 						data = core.dom.data(CONTAINER);
 						if(new_url != null && (url !== data.location || force_refresh)) {
+							// Update location to avoid race conditions of something setting the state before it's
+							// completed which may cause it to load the same url twice.
+							data.location = url;
+							core.dom.data(CONTAINER, 'location', url);
 							core.dom.trigger(CONTAINER, 'ampcms.pagelet.loadstart');
 							core.ajax.get(new_url, function(response) {
 								core.dom.trigger(CONTAINER, 'ampcms.pagelet.loadajaxcomplete');
@@ -239,6 +245,9 @@ define(['ampcms/sandbox'], function(sandbox) {
 						if(data != null && data.starting_url) {
 							url = data.starting_url;
 						}
+					}
+					if (url instanceof Array) {
+						url = url[0];
 					}
 					return url;
 				},
