@@ -48,6 +48,8 @@ settings.AMPCMS_RESPONSE_CLASS = getattr(settings, 'AMPCMS_RESPONSE_CLASS', None
 settings.AMPCMS_CACHING = getattr(settings, 'AMPCMS_CACHING', False)
 settings.AMPCMS_CACHING_TIMEOUT = getattr(settings, 'AMPCMS_CACHING_TIMEOUT', 0)
 
+settings.AMPCMS_HOST_DATABASES = getattr(settings, 'AMPCMS_HOST_DATABASES', {})
+
 # TODO: Remove the need for any of this
 settings.AMPCMS_ACCOUNT_URLCONF = getattr(settings, 'AMPCMS_ACCOUNT_URLCONF', 'auth.urls')
 settings.AMPCMS_ACCOUNT_LOGIN_URL = getattr(settings, 'AMPCMS_ACCOUNT_LOGIN_URL', '/login')

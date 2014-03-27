@@ -1,4 +1,4 @@
-from django.conf import settings
+from ampcms.conf import settings
 
 def get_database_by_host(host):
     database = settings.AMPCMS_HOST_DATABASES.get(host)
